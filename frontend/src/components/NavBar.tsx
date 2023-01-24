@@ -34,6 +34,7 @@ const NavBar = () => {
                 to={link}
                 style='group flex text-sm font-medium p-2 hover:bg-gray-800 rounded-md'
                 isActiveStyle='bg-gray-800 rounded-md'
+                key={i}
               >
                 <Icon size={22} />
               </CustomLink>

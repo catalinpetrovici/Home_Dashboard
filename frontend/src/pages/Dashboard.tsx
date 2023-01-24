@@ -5,7 +5,7 @@ import { useQuery, useMutation } from '@tanstack/react-query';
 type LedSubmit = { value: number; id: string };
 
 const fetchUsers = async () => {
-  const res = await fetch('/api/v1');
+  const res = await fetch('http://localhost/api/v1');
   return res.json();
 };
 
@@ -14,7 +14,7 @@ export const addLed = async ({ value, id }: LedSubmit) => {
     [id]: value.toString(),
   };
 
-  return await fetch(`http://192.168.0.111/api/v1/led`, {
+  return await fetch(`http://localhost/api/v1/led`, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -29,8 +29,6 @@ const Dashboard = () => {
   const { status, data, isLoading, isError } = useQuery(['users'], fetchUsers);
   const [valueRange, setValueRange] = useState({ '1': 0, '2': 0 });
   const changeLedValueMutation = useMutation(addLed);
-
-  console.log(data);
 
   useEffect(() => {
     if (status === 'success') {
@@ -58,7 +56,7 @@ const Dashboard = () => {
       <div className='flex flex-wrap'>
         <section className='group-2 w-full max-200 m-1'>
           {Object.keys(valueRange).map((id: string) => (
-            <section className='test mt-2'>
+            <section className='test mt-2' key={id}>
               <span className='mb-2 block text-[#ffffff72]'>Led {id}</span>
               <RangeSlider
                 className='w-full'
