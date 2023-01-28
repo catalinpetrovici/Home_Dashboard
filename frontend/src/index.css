@@ -30,7 +30,8 @@ span {
 }
 
 .test {
-  padding: 0.5rem;
+  margin: 10px;
+  padding: 8px;
   background-color: #151423;
   border: solid 1.5px #222039;
   border-radius: 5px;
@@ -46,7 +47,7 @@ span {
 /* ################################ */
 
 :root {
-  --slider-width: 180px;
+  --slider-width: 160px;
   --slider-height: 50px;
   --slider-color: #00aac5;
 }

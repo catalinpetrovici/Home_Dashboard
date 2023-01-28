@@ -1,17 +1,19 @@
 #!/bin/bash
+MAIN_PATH=${PWD};
 
-echo "Script executed from: ${PWD}";
+echo "Script executed from: $STR";
 
-command(){
+command() {
   echo "";
-  echo "Start $1 packages";
-  cd /${PWD}/$1/;
-  npm run dev;
+  PATH="$MAIN_PATH/$1";
+  echo "Start $PATH packages";
+  cd $PATH;
+  yarn dev;
 }
 
-command frontend &
-command backend 
+command "frontend" &
+command "backend" 
 wait
 
 echo "";
-echo "   ^|^e      ^|^e      ^|^e      ^|^e      ^|^e      ^|^e      ^|^e      ^|^e";
+echo "✅   ✅   ✅   ✅   ✅   ✅   ✅   ✅";

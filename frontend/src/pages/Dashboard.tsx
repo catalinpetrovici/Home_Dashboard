@@ -1,43 +1,47 @@
 import { useRef, useLayoutEffect, useState, useEffect } from 'react';
+import useDebounce from '../customHooks/useDebounce';
 import RangeSlider from '../components/RangeSlider';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import axiosIns from '../utils/axios';
+import axios from 'axios';
 
-type LedSubmit = { value: number; id: string };
-
-const fetchUsers = async () => {
-  const res = await fetch('http://localhost/api/v1');
-  return res.json();
+const fetchData = async () => {
+  const res = await axiosIns.get('/api/v1');
+  console.log('axios', res);
+  return res.data;
 };
 
-export const addLed = async ({ value, id }: LedSubmit) => {
-  const object = {
-    [id]: value.toString(),
-  };
-
-  return await fetch(`http://localhost/api/v1/led`, {
-    method: 'POST',
-    headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(object),
-  });
+export const addLed = async (data: any) => {
+  console.log(data);
+  await axiosIns.post(`/api/v1/led`, data);
 };
 
 const Dashboard = () => {
-  const ref = useRef(null);
-  const { status, data, isLoading, isError } = useQuery(['users'], fetchUsers);
-  const [valueRange, setValueRange] = useState({ '1': 0, '2': 0 });
-  const changeLedValueMutation = useMutation(addLed);
+  const [sliderData, setSliderData] = useState({});
+  const [switchData, setSwitchData] = useState({});
+  useDebounce(() => handleSubmit(), 500, [sliderData]);
+
+  const { status, data, isLoading, isError } = useQuery(['data'], fetchData);
 
   useEffect(() => {
-    if (status === 'success') {
-      setValueRange({ ...data });
+    if (!isLoading) {
+      setSliderData(data.slider);
+      setSwitchData(data.switch);
+      console.log('SET SLIDER & SWITCH DATA');
     }
-  }, [status, data]);
+  }, [data]);
 
-  const handleSubmit = (led: LedSubmit) => {
-    changeLedValueMutation.mutate(led);
+  const changeLedValueMutation = useMutation(addLed);
+
+  const handleSubmit = () => {
+    changeLedValueMutation.mutate(sliderData);
+  };
+
+  const handleSwitchSubmit = (id: any, value: any) => {
+    setSwitchData((oldData) => {
+      changeLedValueMutation.mutate({ ...oldData, [id]: !value });
+      return { ...oldData, [id]: !value };
+    });
   };
 
   const handleRangeSubmit = (
@@ -46,44 +50,61 @@ const Dashboard = () => {
   ) => {
     e.preventDefault();
     const value = parseFloat(e.target.value);
-    handleSubmit({ value, id });
-    setValueRange({ ...valueRange, [id]: [value] });
+    setSliderData((oldData) => {
+      return { ...oldData, [id]: value };
+    });
   };
 
+  if (isLoading) {
+    return <h1 className='text-white title'>Loading...</h1>;
+  }
+  if (isError) {
+    return (
+      <h1 className='text-white title'>Error! Please contact the host.</h1>
+    );
+  }
+
   return (
-    <div ref={ref} className=''>
+    <div className=''>
       <h1 className='text-white title'>Controls</h1>
       <div className='flex flex-wrap'>
         <section className='group-2 w-full max-200 m-1'>
-          {Object.keys(valueRange).map((id: string) => (
-            <section className='test mt-2' key={id}>
-              <span className='mb-2 block text-[#ffffff72]'>Led {id}</span>
-              <RangeSlider
-                className='w-full'
-                stepRange={1}
-                minRange={0}
-                maxRange={255}
-                valueRange={valueRange[id as keyof typeof valueRange]}
-                handleRangeChange={(event) => handleRangeSubmit(event, id)}
-              />
-            </section>
-          ))}
+          {Object.entries(sliderData).map((curr: any) => {
+            const [id, value] = curr;
+            return (
+              <section className='test mt-2' key={id}>
+                <span className='mb-2 block text-[#ffffff72]'>{id}</span>
+                <RangeSlider
+                  className='w-full'
+                  stepRange={1}
+                  minRange={0}
+                  maxRange={255}
+                  valueRange={+value}
+                  handleRangeChange={(e) => {
+                    handleRangeSubmit(e, id);
+                  }}
+                />
+              </section>
+            );
+          })}
         </section>
         <section className='group-3 w-full max-200 m-1'>
-          <section className='test'>
-            <span className='mb-2 block text-[#ffffff72]'>Led Bedroom</span>
-            <label className='switch'>
-              <input type='checkbox' />
-              <span className='slider round'></span>
-            </label>
-          </section>
-          <section className='test'>
-            <span className='mb-2 block text-[#ffffff72]'>Led PC</span>
-            <label className='switch'>
-              <input type='checkbox' />
-              <span className='slider round'></span>
-            </label>
-          </section>
+          {Object.entries(switchData).map((curr: any) => {
+            const [id, value] = curr;
+            return (
+              <section key={id} className='test'>
+                <span className='mb-2 block text-[#ffffff72]'>Led Bedroom</span>
+                <label className='switch'>
+                  <input
+                    type='checkbox'
+                    checked={value}
+                    onChange={() => handleSwitchSubmit(id, value)}
+                  />
+                  <span className='slider round'></span>
+                </label>
+              </section>
+            );
+          })}
         </section>
       </div>
     </div>

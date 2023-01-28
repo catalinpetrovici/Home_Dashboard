@@ -1,17 +1,37 @@
 import { Request, Response } from 'express';
 // eslint-disable-next-line import/no-extraneous-dependencies
-import axios from 'axios';
+import axiosIns from '../../utils/axios';
 
 export async function getData(req: Request, res: Response): Promise<void> {
-  const { data } = await axios.get('http://192.168.0.124:1880/api/v1/data');
+  const { data } = await axiosIns.get('api/v1/data');
 
-  res.json(data);
+  const formatData = data.reduce(
+    (acc: any, current: any) => {
+      let { value, id, type } = current;
+
+      value = value === 'Off' ? false : value === 'On' ? true : value;
+
+      if (acc[type]) {
+        const obj = {
+          ...acc[type],
+          [id]: value,
+        };
+        return { ...acc, [type]: { ...obj } };
+      }
+    },
+    { switch: {}, slider: {} }
+  );
+
+  res.json({ ...formatData });
 }
 export async function ledControl(req: Request, res: Response): Promise<void> {
-  const key = Object.keys(req.body);
-  const value = Object.values(req.body);
+  const data = req.body;
 
-  await axios.post(`http://192.168.0.124:1880/api/v1/led${key[0]}`, value);
+  Object.entries(data).forEach(async (led) => {
+    let [id, value] = led;
+    value = value === true ? 'On' : value === false ? 'Off' : value;
+    await axiosIns.post(`/api/v1/${id}`, { [id]: value });
+  });
 
   res.json('success');
 }

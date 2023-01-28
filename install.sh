@@ -1,15 +1,15 @@
 #!/bin/bash
 
-command(){
+command() {
   echo "";
   echo "Install $1 packages";
   cd /${PWD}/$1/;
-  npm install;
+  yarn install;
 }
 
-command frontend &
-command backend
+command "frontend" &
+command "backend"
 wait
 
 echo "";
-echo "   ^|^e      ^|^e      ^|^e      ^|^e      ^|^e      ^|^e      ^|^e      ^|^e";
+echo "✅   ✅   ✅   ✅   ✅   ✅   ✅   ✅";

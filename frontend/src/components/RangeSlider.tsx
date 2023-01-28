@@ -17,17 +17,15 @@ const RangeSlider = ({
   handleRangeChange,
 }: RangeSlider) => {
   return (
-    <div>
-      <input
-        type='range'
-        value={valueRange}
-        min={minRange}
-        max={maxRange}
-        step={stepRange}
-        onChange={handleRangeChange}
-        className={className}
-      />
-    </div>
+    <input
+      type='range'
+      value={valueRange}
+      min={minRange}
+      max={maxRange}
+      step={stepRange}
+      onChange={handleRangeChange}
+      className={className}
+    />
   );
 };
 
