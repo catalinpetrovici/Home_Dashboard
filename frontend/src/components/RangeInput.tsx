@@ -39,6 +39,7 @@ const RangeInput = ({
         onChange={(e) => handleChange(e)}
         className={className}
         onMouseUp={handleChangeMouseUp} // only set state when handle is released
+        onTouchEnd={handleChangeMouseUp}
       />
     </section>
   );
