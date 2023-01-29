@@ -1,13 +1,9 @@
 #!/bin/bash
-MAIN_PATH=${PWD};
-
-echo "Script executed from: $STR";
 
 command() {
   echo "";
-  PATH="$MAIN_PATH/$1";
-  echo "Start $PATH packages";
-  cd $PATH;
+  echo "Start $1 server";
+  cd /${PWD}/$1/
   yarn dev;
 }
 

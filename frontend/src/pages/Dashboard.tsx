@@ -1,6 +1,7 @@
 import { useRef, useLayoutEffect, useState, useEffect } from 'react';
 import useDebounce from '../customHooks/useDebounce';
-import RangeSlider from '../components/RangeSlider';
+import RangeInput from '../components/RangeInput';
+import CheckBoxInput from '../components/CheckBoxInput';
 import { useQuery, useMutation } from '@tanstack/react-query';
 import axiosIns from '../utils/axios';
 import axios from 'axios';
@@ -11,49 +12,22 @@ const fetchData = async () => {
   return res.data;
 };
 
-export const addLed = async (data: any) => {
+export const sentCommand = async (data: any) => {
   console.log(data);
   await axiosIns.post(`/api/v1/led`, data);
 };
 
 const Dashboard = () => {
-  const [sliderData, setSliderData] = useState({});
-  const [switchData, setSwitchData] = useState({});
-  useDebounce(() => handleSubmit(), 500, [sliderData]);
-
   const { status, data, isLoading, isError } = useQuery(['data'], fetchData);
 
-  useEffect(() => {
-    if (!isLoading) {
-      setSliderData(data.slider);
-      setSwitchData(data.switch);
-      console.log('SET SLIDER & SWITCH DATA');
-    }
-  }, [data]);
+  const sendCommandMutation = useMutation(sentCommand);
 
-  const changeLedValueMutation = useMutation(addLed);
-
-  const handleSubmit = () => {
-    changeLedValueMutation.mutate(sliderData);
-  };
-
-  const handleSwitchSubmit = (id: any, value: any) => {
-    setSwitchData((oldData) => {
-      changeLedValueMutation.mutate({ ...oldData, [id]: !value });
-      return { ...oldData, [id]: !value };
-    });
-  };
-
-  const handleRangeSubmit = (
-    e: React.ChangeEvent<HTMLInputElement>,
+  async function sendCommandComponent(
+    value: string | number | boolean,
     id: string
-  ) => {
-    e.preventDefault();
-    const value = parseFloat(e.target.value);
-    setSliderData((oldData) => {
-      return { ...oldData, [id]: value };
-    });
-  };
+  ) {
+    sendCommandMutation.mutate({ value, id });
+  }
 
   if (isLoading) {
     return <h1 className='text-white title'>Loading...</h1>;
@@ -68,42 +42,130 @@ const Dashboard = () => {
     <div className=''>
       <h1 className='text-white title'>Controls</h1>
       <div className='flex flex-wrap'>
-        <section className='group-2 w-full max-200 m-1'>
-          {Object.entries(sliderData).map((curr: any) => {
-            const [id, value] = curr;
-            return (
-              <section className='test mt-2' key={id}>
-                <span className='mb-2 block text-[#ffffff72]'>{id}</span>
-                <RangeSlider
-                  className='w-full'
-                  stepRange={1}
-                  minRange={0}
-                  maxRange={255}
-                  valueRange={+value}
-                  handleRangeChange={(e) => {
-                    handleRangeSubmit(e, id);
-                  }}
+        <section className='group-1 w-full max-200 m-1'>
+          {data.map((curr: any) => {
+            const { id, value, type, tab, name, setupRange } = curr;
+
+            if (tab != 1 || (type !== 'switch' && type !== 'slider')) return;
+
+            if (type === 'switch') {
+              return (
+                <CheckBoxInput
+                  id={id}
+                  key={id}
+                  value={value}
+                  name={name}
+                  sendCommand={sendCommandComponent}
                 />
-              </section>
-            );
+              );
+            }
+            if (type === 'slider') {
+              return (
+                <RangeInput
+                  id={id}
+                  key={id}
+                  setupRange={setupRange}
+                  value={value}
+                  name={name}
+                  sendCommand={sendCommandComponent}
+                />
+              );
+            }
+          })}
+        </section>
+        <section className='group-2 w-full max-200 m-1'>
+          {data.map((curr: any) => {
+            const { id, value, type, tab, name, setupRange } = curr;
+
+            if (tab != 2 || (type !== 'switch' && type !== 'slider')) return;
+
+            if (type === 'switch') {
+              return (
+                <CheckBoxInput
+                  id={id}
+                  key={id}
+                  value={value}
+                  name={name}
+                  sendCommand={sendCommandComponent}
+                />
+              );
+            }
+            if (type === 'slider') {
+              return (
+                <RangeInput
+                  id={id}
+                  key={id}
+                  setupRange={setupRange}
+                  value={value}
+                  name={name}
+                  sendCommand={sendCommandComponent}
+                />
+              );
+            }
           })}
         </section>
         <section className='group-3 w-full max-200 m-1'>
-          {Object.entries(switchData).map((curr: any) => {
-            const [id, value] = curr;
-            return (
-              <section key={id} className='test'>
-                <span className='mb-2 block text-[#ffffff72]'>Led Bedroom</span>
-                <label className='switch'>
-                  <input
-                    type='checkbox'
-                    checked={value}
-                    onChange={() => handleSwitchSubmit(id, value)}
-                  />
-                  <span className='slider round'></span>
-                </label>
-              </section>
-            );
+          {data.map((curr: any) => {
+            const { id, value, type, tab, name, setupRange } = curr;
+
+            if (tab != 3 || (type !== 'switch' && type !== 'slider')) return;
+
+            if (type === 'switch') {
+              const val =
+                value === 'Off' ? false : value === 'On' ? true : value;
+              return (
+                <CheckBoxInput
+                  id={id}
+                  key={id}
+                  value={val}
+                  name={name}
+                  sendCommand={sendCommandComponent}
+                />
+              );
+            }
+            if (type === 'slider') {
+              return (
+                <RangeInput
+                  id={id}
+                  key={id}
+                  setupRange={setupRange}
+                  value={value}
+                  name={name}
+                  sendCommand={sendCommandComponent}
+                />
+              );
+            }
+          })}
+        </section>
+        <section className='group-4 w-full max-200 m-1'>
+          {data.map((curr: any) => {
+            const { id, value, type, tab, name, setupRange } = curr;
+
+            if (tab != 4 || (type !== 'switch' && type !== 'slider')) return;
+
+            if (type === 'switch') {
+              return (
+                <CheckBoxInput
+                  id={id}
+                  key={id}
+                  value={value}
+                  name={name}
+                  sendCommand={sendCommandComponent}
+                />
+              );
+            }
+            if (type === 'slider') {
+              return (
+                <RangeInput
+                  id={id}
+                  key={id}
+                  setupRange={setupRange}
+                  value={value}
+                  name={name}
+                  sendCommand={sendCommandComponent}
+                />
+              );
+            }
           })}
         </section>
       </div>
