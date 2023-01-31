@@ -13,6 +13,8 @@ const fetchData = async () => {
 };
 
 export const sentCommand = async (data: any) => {
+  // TODO VALIDATE THE DATA
+
   console.log(data);
   await axiosIns.post(`/api/v1/led`, data);
 };

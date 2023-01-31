@@ -3,6 +3,10 @@ import { Request, Response } from 'express';
 import axiosIns from '../../utils/axios';
 
 export async function getData(req: Request, res: Response): Promise<void> {
+  // TODO VALIDATE THE BODY
+
+  // TODO ERROR HANDLING
+
   const { data } = await axiosIns.get('/api/v1/data');
 
   const newData = Object.values(data);
@@ -11,12 +15,20 @@ export async function getData(req: Request, res: Response): Promise<void> {
 }
 
 export async function ledControl(req: Request, res: Response): Promise<void> {
+  // TODO VALIDATE THE BODY
+
+  // TODO ERROR HANDLING
+
   const { value, id } = req.body;
   await axiosIns.post(`/api/v1/${id}`, { [id]: value });
   res.json('success');
 }
 
 export async function getCharts(req: Request, res: Response): Promise<void> {
+  // TODO VALIDATE THE BODY
+
+  // TODO ERROR HANDLING
+
   const { data } = await axiosIns.get('/api/v1/charts');
 
   res.json(data);
