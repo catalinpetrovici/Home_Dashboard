@@ -31,19 +31,19 @@ const Dashboard = () => {
   }
 
   if (isLoading) {
-    return <h1 className='text-white title'>Loading...</h1>;
+    return <h1 className='title text-white'>Loading...</h1>;
   }
   if (isError) {
     return (
-      <h1 className='text-white title'>Error! Please contact the host.</h1>
+      <h1 className='title text-white'>Error! Please contact the host.</h1>
     );
   }
 
   return (
     <div className=''>
-      <h1 className='text-white title'>Controls</h1>
+      <h1 className='title text-white'>Controls</h1>
       <div className='flex flex-wrap'>
-        <section className='group-1 w-full max-200 m-1'>
+        <section className='group-1 max-200 m-1 w-full'>
           {data.map((curr: any) => {
             const { id, value, type, tab, name, setupRange } = curr;
 
@@ -74,7 +74,7 @@ const Dashboard = () => {
             }
           })}
         </section>
-        <section className='group-2 w-full max-200 m-1'>
+        <section className='group-2 max-200 m-1 w-full'>
           {data.map((curr: any) => {
             const { id, value, type, tab, name, setupRange } = curr;
 
@@ -105,7 +105,7 @@ const Dashboard = () => {
             }
           })}
         </section>
-        <section className='group-3 w-full max-200 m-1'>
+        <section className='group-3 max-200 m-1 w-full'>
           {data.map((curr: any) => {
             const { id, value, type, tab, name, setupRange } = curr;
 
@@ -138,7 +138,7 @@ const Dashboard = () => {
             }
           })}
         </section>
-        <section className='group-4 w-full max-200 m-1'>
+        <section className='group-4 max-200 m-1 w-full'>
           {data.map((curr: any) => {
             const { id, value, type, tab, name, setupRange } = curr;
 

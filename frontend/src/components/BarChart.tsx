@@ -31,7 +31,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   }
   if (active && payload && payload.length) {
     return (
-      <div className='border-1 p-2 text-white bg-[#000000d2]'>
+      <div className='border-1 bg-[#000000d2] p-2 text-white'>
         <p className='label'>{customLabel}</p>
         <p>{payload[0].value} Wh</p>
       </div>
@@ -62,11 +62,11 @@ const BarCharts = ({ width, className }: any) => {
     width > 900 ? width * 0.005 : width < 500 ? width * 0.02 : width * 0.008;
 
   if (isLoading) {
-    return <h1 className='text-white title'>Loading...</h1>;
+    return <h1 className='title text-white'>Loading...</h1>;
   }
   if (isError) {
     return (
-      <h1 className='text-white title'>Error! Please contact the host.</h1>
+      <h1 className='title text-white'>Error! Please contact the host.</h1>
     );
   }
 

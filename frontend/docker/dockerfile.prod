@@ -23,3 +23,5 @@ COPY --from=react-build /app/dist /usr/share/nginx/html
 
 # docker image ls
 # docker rmi <ID> -f
+
+# docker inspect <container-name>

@@ -13,7 +13,7 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <NavBar />
-      <main className='w-screen y-screen bg-[#121220] pl-5 pr-5'>
+      <main className='y-screen w-screen bg-[#121220] pl-5 pr-5'>
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/login' element={<Login />} />

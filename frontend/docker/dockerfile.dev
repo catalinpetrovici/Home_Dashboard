@@ -13,3 +13,7 @@ CMD [ "yarn", "dev"]
 
 # docker image ls
 # docker rmi <ID> -f
+
+# docker inspect <container-name>
+
+# depends_on

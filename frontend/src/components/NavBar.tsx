@@ -17,30 +17,43 @@ const NavBar = () => {
     { name: 'Setting', link: '/settings', Icon: RiSettings4Line },
   ];
 
+  if (import.meta.env.DEV) {
+    console.log('DEV mode');
+  }
+
+  if (import.meta.env.PROD) {
+    console.log('PROD mode');
+  }
+
   // const [open, setOpen] = useState(false);
 
   return (
     <nav className='flex gap-6 border-r border-slate-700'>
-      <div className='bg-[#11111F] min-h-screen w-16 duration-500 text-gray-100'>
-        <div className='py-3 flex justify-center'>
-          {/* <img src={mainLogo} alt='Logo' /> */}
-        </div>
-        <ul className='flex flex-col items-center gap-8'>
-          {menus?.map((menu, i) => {
-            const { name, link, Icon } = menu;
+      <div className='bg-[#11111F] min-h-screen w-16 duration-500 text-gray-100 flex flex-col justify-between'>
+        <div>
+          <div className='py-3 flex justify-center' id='logo'>
+            {/* <img src={mainLogo} alt='Logo' /> */}
+          </div>
+          <ul className='flex flex-col items-center gap-8'>
+            {menus?.map((menu, i) => {
+              const { name, link, Icon } = menu;
 
-            return (
-              <CustomLink
-                to={link}
-                style='group flex text-sm font-medium p-2 hover:bg-gray-800 rounded-md'
-                isActiveStyle='bg-gray-800 rounded-md'
-                key={i}
-              >
-                <Icon size={22} />
-              </CustomLink>
-            );
-          })}
-        </ul>
+              return (
+                <CustomLink
+                  to={link}
+                  style='group flex text-sm font-medium p-2 hover:bg-gray-800 rounded-md'
+                  isActiveStyle='bg-gray-800 rounded-md'
+                  key={i}
+                >
+                  <Icon size={22} />
+                </CustomLink>
+              );
+            })}
+          </ul>
+        </div>
+        {import.meta.env.DEV && (
+          <div className='py-3 text-center'>Dev Mode</div>
+        )}
       </div>
     </nav>
   );

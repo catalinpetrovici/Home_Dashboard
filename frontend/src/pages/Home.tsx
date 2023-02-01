@@ -34,9 +34,9 @@ const Home = () => {
 
   return (
     <div ref={ref} className=''>
-      <h1 className='text-white title'>Welcome home</h1>
+      <h1 className='title text-white'>Welcome home</h1>
       <div className='flex flex-wrap'>
-        <section className='group-1 m-1 max-300'>
+        <section className='group-1 max-300 m-1'>
           <div className='test'>
             <span className='mb-2 block text-[#ffffff72]'>
               How's the air quality?
@@ -44,7 +44,7 @@ const Home = () => {
             <span>The air quality is good and fresh you can go out today</span>
           </div>
         </section>
-        <section className='group-3 m-1 max-300'>
+        {/* <section className='group-3 m-1 max-300'>
           <div className='test'>
             <span className='mb-2 block text-[#ffffff72]'>Outside</span>
             <div className='inline-block'>
@@ -66,8 +66,8 @@ const Home = () => {
               </span>
             </div>
           </div>
-        </section>
-        <section className='group-4 m-1 max-300'>
+        </section> */}
+        {/* <section className='group-4 m-1 max-300'>
           <div className='test'>
             <span className='mb-2 block text-[#ffffff72]'>Inside</span>
             <div className='inline-block'>
@@ -89,16 +89,15 @@ const Home = () => {
               </span>
             </div>
           </div>
-        </section>
-
+        </section> */}
         <section className='group-2 m-1'>
           <div className='test'>
             <span className='mb-2 block text-[#ffffff72]'>Temperature</span>
-            <PieCharts data={data} COLORS={COLORS} value='24°C' />
+            <PieCharts key={1} data={data} COLORS={COLORS} value='24°C' />
           </div>
-          <div className='mt-2 test'>
+          <div className='test mt-2'>
             <span className='mb-2 block text-[#ffffff72]'>Humidity</span>
-            <PieCharts data={data2} COLORS={COLORS2} value='60%' />
+            <PieCharts key={2} data={data2} COLORS={COLORS2} value='60%' />
           </div>
         </section>
       </div>

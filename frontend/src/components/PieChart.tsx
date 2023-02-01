@@ -1,13 +1,16 @@
 import { PieChart, Pie, Cell, Label, Rectangle } from 'recharts';
 
-const PieCharts = ({ data, COLORS, value }: any) => {
+const PieCharts = ({ data, COLORS, value }: any, ...rest: any[]) => {
   let r = (Math.random() + 1).toString(36).substring(7);
 
   return (
-    <PieChart width={190} height={110}>
+    <PieChart width={190} height={110} {...rest}>
       <defs>
         {data.map((entry: any, index: number) => (
-          <linearGradient id={`myGradient-${r}-${index}`}>
+          <linearGradient
+            key={`myGradient-${r}-${index}`}
+            id={`myGradient-${r}-${index}`}
+          >
             <stop offset='0%' stopColor={COLORS[index % COLORS.length].start} />
             <stop offset='100%' stopColor={COLORS[index % COLORS.length].end} />
           </linearGradient>

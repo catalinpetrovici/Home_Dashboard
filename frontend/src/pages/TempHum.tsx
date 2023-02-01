@@ -41,16 +41,16 @@ const BookList = () => {
 
   return (
     <div ref={ref} className=''>
-      <h1 className='text-white title'>Temp & Hum</h1>
+      <h1 className='title text-white'>Temp & Hum</h1>
       <div className='flex flex-wrap'>
         <section>
-          <div className='inline-block test'>
+          <div className='test inline-block'>
             <span className='mb-2 block'>Power Consumption</span>
             <BarCharts width={width} />
           </div>
         </section>
         <section>
-          <div className='max-w-min mt-2 lg:ml-10 lg:mt-0 test'>
+          <div className='test mt-2 max-w-min lg:ml-10 lg:mt-0'>
             <span className='mb-2 block'>Temp & Hum</span>
             <LineCharts width={width} />
           </div>
