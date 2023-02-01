@@ -17,7 +17,9 @@
 
 #### TODO
 
-- [ ] backend validation - [zod](https://www.npmjs.com/package/zod)
+- [ ] backend validation - [Zod](https://www.npmjs.com/package/zod)
 - [ ] backend error handling
-- [ ] frontend validation - [zod](https://www.npmjs.com/package/zod), [yup](https://www.npmjs.com/package/yup)
-- [ ] secure on local - [https in docker](https://github.com/vishalraj82/https-in-docker)
+- [ ] frontend validation - [Zod](https://www.npmjs.com/package/zod), [Yup](https://www.npmjs.com/package/yup)
+- [ ] secure on local - [Https in docker](https://github.com/vishalraj82/https-in-docker), [https-localhost](https://github.com/daquinoaldo/https-localhost)
+- [ ] PWA - [PWA Vite Plugin](https://vite-pwa-org.netlify.app/)
+- [ ] DOCKER dev/prod - [node](https://www.youtube.com/watch?v=gm_L69NHuHM), [react](https://www.youtube.com/watch?v=3xDAU5cvi5E)

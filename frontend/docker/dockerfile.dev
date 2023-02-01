@@ -1,0 +1,15 @@
+FROM node
+WORKDIR /app
+COPY package.json .
+RUN yarn install
+COPY . ./
+ENV PORT 5173
+EXPOSE $PORT
+CMD [ "yarn", "dev"]
+
+# docker build --file=dockerfile.dev -t frontend-dashboard-dev .
+
+# docker-compose -f docker-compose-dev.yml up -d --build
+
+# docker image ls
+# docker rmi <ID> -f

@@ -1,0 +1,25 @@
+FROM node as react-build
+WORKDIR /app
+COPY package.json .
+RUN yarn install
+ARG VITE_NODE_ENV
+# RUN if [ "$NODE_ENV" = "development" ]; \
+#         then yarn install; \
+#         else yarn install --only=production; \
+#         fi
+COPY . ./
+ARG VITE_SERVER_TEST
+ENV VITE_SERVER_TEST=$VITE_SERVER_TEST
+ARG VITE_SERVER_HOST
+ENV VITE_SERVER_HOST=$VITE_SERVER_HOST
+RUN yarn build
+
+FROM nginx
+COPY --from=react-build /app/dist /usr/share/nginx/html
+
+# docker build --file=dockerfile.prod -t frontend-dashboard-prod .
+
+# docker-compose -f docker-compose-prod.yml up -d --build
+
+# docker image ls
+# docker rmi <ID> -f
