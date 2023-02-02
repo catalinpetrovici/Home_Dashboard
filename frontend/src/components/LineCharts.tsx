@@ -10,8 +10,6 @@ import {
   ResponsiveContainer,
 } from 'recharts';
 
-import { hum, temp } from './data';
-
 const LineCharts = ({ width, className }: any) => {
   const widthContainer =
     width > 900 ? width * 0.45 : width < 500 ? width : width * 0.8;
@@ -20,7 +18,7 @@ const LineCharts = ({ width, className }: any) => {
 
   return (
     <>
-      <LineChart
+      {/* <LineChart
         data={temp}
         height={300}
         width={widthContainer * 0.92}
@@ -59,7 +57,7 @@ const LineCharts = ({ width, className }: any) => {
         <Tooltip />
         <Legend />
         <Line type='monotone' dataKey='hum' stroke='#4b44d8' dot={<></>} />
-      </LineChart>
+      </LineChart> */}
     </>
   );
 };

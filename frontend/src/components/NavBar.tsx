@@ -3,7 +3,6 @@ import { RiSettings4Line } from 'react-icons/ri';
 import { TbReportAnalytics } from 'react-icons/tb';
 import { AiOutlineUser, AiOutlineHeart, AiOutlineHome } from 'react-icons/ai';
 import { FiFolder } from 'react-icons/fi';
-import { Link, useMatch } from 'react-router-dom';
 import CustomLink from './CustomLink';
 
 const NavBar = () => {
@@ -17,25 +16,18 @@ const NavBar = () => {
     { name: 'Setting', link: '/settings', Icon: RiSettings4Line },
   ];
 
-  if (import.meta.env.DEV) {
-    console.log('DEV mode');
-  }
-
-  if (import.meta.env.PROD) {
-    console.log('PROD mode');
-  }
-
-  // const [open, setOpen] = useState(false);
+  console.log('DEV MODE:', import.meta.env.DEV);
+  console.log('PROD MODE:', import.meta.env.PROD);
 
   return (
     <nav className='flex gap-6 border-r border-slate-700'>
-      <div className='bg-[#11111F] min-h-screen w-16 duration-500 text-gray-100 flex flex-col justify-between'>
+      <div className='flex min-h-screen w-16 flex-col justify-between bg-[#11111F] text-gray-100 duration-500'>
         <div>
-          <div className='py-3 flex justify-center' id='logo'>
+          <div className='flex justify-center py-3' id='logo'>
             {/* <img src={mainLogo} alt='Logo' /> */}
           </div>
           <ul className='flex flex-col items-center gap-8'>
-            {menus?.map((menu, i) => {
+            {menus?.map((menu) => {
               const { name, link, Icon } = menu;
 
               return (
@@ -43,7 +35,7 @@ const NavBar = () => {
                   to={link}
                   style='group flex text-sm font-medium p-2 hover:bg-gray-800 rounded-md'
                   isActiveStyle='bg-gray-800 rounded-md'
-                  key={i}
+                  key={name}
                 >
                   <Icon size={22} />
                 </CustomLink>

@@ -2,8 +2,16 @@ import PieCharts from '../components/PieChart';
 import { CiTempHigh } from 'react-icons/ci';
 import { WiHumidity } from 'react-icons/wi';
 import { useRef, useLayoutEffect, useState } from 'react';
+import axiosIns from '../utils/axios';
+import { useQuery, useMutation } from '@tanstack/react-query';
 
-const data = [
+const fetchData = async () => {
+  const res = await axiosIns.get('/api/v1/temp');
+  console.log('axios', res);
+  return res.data;
+};
+
+const data123 = [
   { name: 'Group A', value: 10 },
   { name: 'Group A', value: 5 },
   { name: 'Group B', value: 10 },
@@ -31,6 +39,19 @@ const Home = () => {
   const ref = useRef<HTMLDivElement>(null);
   const [width, setWidth] = useState(0);
   const [height, setHeight] = useState(0);
+
+  const { status, data, isLoading, isError } = useQuery(['data'], fetchData);
+
+  console.log(data);
+
+  if (isLoading) {
+    return <h1 className='title text-white'>Loading...</h1>;
+  }
+  if (isError) {
+    return (
+      <h1 className='title text-white'>Error! Please contact the host.</h1>
+    );
+  }
 
   return (
     <div ref={ref} className=''>
@@ -93,7 +114,7 @@ const Home = () => {
         <section className='group-2 m-1'>
           <div className='test'>
             <span className='mb-2 block text-[#ffffff72]'>Temperature</span>
-            <PieCharts key={1} data={data} COLORS={COLORS} value='24°C' />
+            <PieCharts key={1} data={data123} COLORS={COLORS} value='24°C' />
           </div>
           <div className='test mt-2'>
             <span className='mb-2 block text-[#ffffff72]'>Humidity</span>

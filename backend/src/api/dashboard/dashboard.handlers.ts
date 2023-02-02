@@ -14,6 +14,16 @@ export async function getData(req: Request, res: Response): Promise<void> {
   res.json(newData);
 }
 
+export async function getTempHum(req: Request, res: Response): Promise<void> {
+  // TODO VALIDATE THE BODY
+
+  // TODO ERROR HANDLING
+
+  const { data } = await axiosIns.get('/api/v1/temp');
+
+  res.json(data);
+}
+
 export async function ledControl(req: Request, res: Response): Promise<void> {
   // TODO VALIDATE THE BODY
 
@@ -34,4 +44,4 @@ export async function getCharts(req: Request, res: Response): Promise<void> {
   res.json(data);
 }
 
-export default { getData, ledControl, getCharts };
+export default { getData, ledControl, getCharts, getTempHum };
