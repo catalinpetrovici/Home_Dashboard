@@ -17,6 +17,7 @@
 
 #### TODO
 
+- [ ] Refactor
 - [ ] backend validation - [Zod](https://www.npmjs.com/package/zod)
 - [ ] backend error handling
 - [ ] frontend validation - [Zod](https://www.npmjs.com/package/zod), [Yup](https://www.npmjs.com/package/yup)

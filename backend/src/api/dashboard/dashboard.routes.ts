@@ -5,6 +5,7 @@ const router = express.Router();
 
 router.get<{}, {}>('/', Dashboard.getData);
 router.get<{}, {}>('/charts', Dashboard.getCharts);
+router.get<{}, {}>('/nowtemp', Dashboard.getNowTempHum);
 router.get<{}, {}>('/temp', Dashboard.getTempHum);
 router.post<{}, {}>('/led', Dashboard.ledControl);
 

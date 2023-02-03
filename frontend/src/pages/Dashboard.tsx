@@ -7,14 +7,12 @@ import axios from 'axios';
 
 const fetchData = async () => {
   const res = await axiosIns.get('/api/v1');
-  console.log('axios', res);
   return res.data;
 };
 
 export const sentCommand = async (data: any) => {
   // TODO VALIDATE THE DATA
 
-  console.log(data);
   await axiosIns.post(`/api/v1/led`, data);
 };
 

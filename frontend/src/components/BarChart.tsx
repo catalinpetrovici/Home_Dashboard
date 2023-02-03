@@ -14,12 +14,13 @@ import { useEffect, useState } from 'react';
 
 const fetchDataBarChart = async () => {
   const res = await axiosIns.get('/api/v1/charts');
-  console.log('axios', res);
   return res.data;
 };
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   let customLabel;
+
+  // maybe padStart(2, '0')
 
   if (label) {
     customLabel =
@@ -41,25 +42,19 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-const BarCharts = ({ width, className }: any) => {
+const BarCharts = ({ className }: any) => {
   const [dataBar, setDataBar] = useState([]);
 
   const { status, data, isLoading, isError } = useQuery(
-    ['chart'],
+    ['chart', 'Wh'],
     fetchDataBarChart
   );
 
   useEffect(() => {
     if (!isLoading) {
       setDataBar(data);
-      console.log('SET Data Bar');
     }
   }, [data]);
-
-  const widthContainer =
-    width > 900 ? width * 0.45 : width < 500 ? width : width * 0.8;
-  const barSizeContainer =
-    width > 900 ? width * 0.005 : width < 500 ? width * 0.02 : width * 0.008;
 
   if (isLoading) {
     return <h1 className='title text-white'>Loading...</h1>;
@@ -74,11 +69,11 @@ const BarCharts = ({ width, className }: any) => {
     <BarChart
       data={data}
       height={300}
-      width={widthContainer * 0.92}
+      width={300}
       margin={{
         left: -22,
       }}
-      barSize={barSizeContainer}
+      barSize={10}
       className={className}
     >
       <CartesianGrid strokeDasharray='5' stroke='#ffffff2a' vertical={false} />

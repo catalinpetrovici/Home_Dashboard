@@ -6,8 +6,7 @@ import axiosIns from '../utils/axios';
 import { useQuery, useMutation } from '@tanstack/react-query';
 
 const fetchData = async () => {
-  const res = await axiosIns.get('/api/v1/temp');
-  console.log('axios', res);
+  const res = await axiosIns.get('/api/v1/nowtemp');
   return res.data;
 };
 
@@ -37,12 +36,11 @@ const COLORS2 = [
 
 const Home = () => {
   const ref = useRef<HTMLDivElement>(null);
-  const [width, setWidth] = useState(0);
-  const [height, setHeight] = useState(0);
 
-  const { status, data, isLoading, isError } = useQuery(['data'], fetchData);
-
-  console.log(data);
+  const { status, data, isLoading, isError } = useQuery(
+    ['temp', 'now'],
+    fetchData
+  );
 
   if (isLoading) {
     return <h1 className='title text-white'>Loading...</h1>;
@@ -65,30 +63,7 @@ const Home = () => {
             <span>The air quality is good and fresh you can go out today</span>
           </div>
         </section>
-        {/* <section className='group-3 m-1 max-300'>
-          <div className='test'>
-            <span className='mb-2 block text-[#ffffff72]'>Outside</span>
-            <div className='inline-block'>
-              <span className='mr-3'>
-                <CiTempHigh
-                  size={30}
-                  className='inline-block text-[#fe696972]'
-                />
-                24
-              </span>
-            </div>
-            <div className='inline-block'>
-              <span>
-                <WiHumidity
-                  size={35}
-                  className='inline-block text-[#7b8dfe72]'
-                />
-                60%
-              </span>
-            </div>
-          </div>
-        </section> */}
-        {/* <section className='group-4 m-1 max-300'>
+        <section className='group-3 max-300 m-1'>
           <div className='test'>
             <span className='mb-2 block text-[#ffffff72]'>Inside</span>
             <div className='inline-block'>
@@ -97,21 +72,47 @@ const Home = () => {
                   size={30}
                   className='inline-block text-[#fe696972]'
                 />
-                24
+                {data.tempInside}
               </span>
             </div>
             <div className='inline-block'>
               <span>
                 <WiHumidity
                   size={35}
-                  className='inline-block text-[#7b8dfe72]'
+                  className='inline-block text-[#556cff72]'
                 />
-                60%
+                {data.humInside}
               </span>
             </div>
           </div>
-        </section> */}
-        <section className='group-2 m-1'>
+          <div className='test'>
+            <span className='mb-2 block  text-[#ffffff72]'>Outside</span>
+            <div className='inline-block'>
+              <span className='mr-3'>
+                <CiTempHigh
+                  size={30}
+                  className={`inline-block ${
+                    data.tempOutside > 0
+                      ? 'text-[#fe696972]'
+                      : 'text-[#557aff72]'
+                  } `}
+                />
+                {data.tempOutside}
+              </span>
+            </div>
+            <div className='inline-block'>
+              <span>
+                <WiHumidity
+                  size={35}
+                  className='inline-block text-[#556cff72]'
+                />
+                {data.humOutside}
+              </span>
+            </div>
+          </div>
+        </section>
+        <section className='group-4 max-300 m-1'></section>
+        {/* <section className='group-2 m-1'>
           <div className='test'>
             <span className='mb-2 block text-[#ffffff72]'>Temperature</span>
             <PieCharts key={1} data={data123} COLORS={COLORS} value='24°C' />
@@ -120,7 +121,7 @@ const Home = () => {
             <span className='mb-2 block text-[#ffffff72]'>Humidity</span>
             <PieCharts key={2} data={data2} COLORS={COLORS2} value='60%' />
           </div>
-        </section>
+        </section> */}
       </div>
     </div>
   );
