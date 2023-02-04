@@ -18,10 +18,11 @@ const NavBar = () => {
 
   console.log('DEV MODE:', import.meta.env.DEV);
   console.log('PROD MODE:', import.meta.env.PROD);
+  console.log('MODE:', import.meta.env.MODE);
 
   return (
     <nav className='flex gap-6 border-r border-slate-700'>
-      <div className='flex min-h-screen w-16 flex-col justify-between bg-[#11111F] text-gray-100 duration-500'>
+      <div className='flex min-h-screen w-14 flex-col justify-between bg-[#11111F] text-gray-100 duration-500 lg:w-16'>
         <div>
           <div className='flex justify-center py-3' id='logo'>
             {/* <img src={mainLogo} alt='Logo' /> */}
@@ -43,9 +44,7 @@ const NavBar = () => {
             })}
           </ul>
         </div>
-        {import.meta.env.DEV && (
-          <div className='py-3 text-center'>Dev Mode</div>
-        )}
+        {import.meta.env.DEV && <div className='cr'>DEV</div>}
       </div>
     </nav>
   );

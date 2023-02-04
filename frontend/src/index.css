@@ -30,7 +30,7 @@ span {
 }
 
 .test {
-  margin: 10px;
+  margin-bottom: 1.25rem;
   padding: 8px;
   background-color: #151423;
   border: solid 1.5px #222039;
@@ -174,3 +174,18 @@ input:checked + .slider:before {
 
 
 /* ###################################### */
+
+
+.cr {
+  width: 100px;
+  left: -33px;
+  bottom: 5px;
+  padding: 3px;
+  font-size: 14px;
+  position: absolute;
+  text-align: center;
+  color: #ffffff;
+  position: fixed;
+  background-color: #87B900;
+  transform: rotate(45deg);
+}

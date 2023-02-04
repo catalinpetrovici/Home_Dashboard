@@ -66,23 +66,27 @@ const BarCharts = ({ className }: any) => {
   }
 
   return (
-    <BarChart
-      data={data}
-      height={300}
-      width={300}
-      margin={{
-        left: -22,
-      }}
-      barSize={10}
-      className={className}
-    >
-      <CartesianGrid strokeDasharray='5' stroke='#ffffff2a' vertical={false} />
-      <XAxis dataKey='name' />
-      <YAxis />
-      <Tooltip content={<CustomTooltip />} />
-      <Legend />
-      <Bar dataKey='Wh' fill='#82ca9d'></Bar>
-    </BarChart>
+    <ResponsiveContainer width='100%' height={300}>
+      <BarChart
+        data={data}
+        margin={{
+          left: -22,
+        }}
+        barSize={10}
+        className={className}
+      >
+        <CartesianGrid
+          strokeDasharray='5'
+          stroke='#ffffff2a'
+          vertical={false}
+        />
+        <XAxis dataKey='name' />
+        <YAxis />
+        <Tooltip content={<CustomTooltip />} />
+        <Legend />
+        <Bar dataKey='Wh' fill='#82ca9d'></Bar>
+      </BarChart>
+    </ResponsiveContainer>
   );
 };
 

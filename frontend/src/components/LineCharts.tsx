@@ -69,46 +69,48 @@ const LineCharts = ({ className }: any) => {
 
   return (
     <>
-      <LineChart
-        data={dataLine}
-        height={300}
-        width={300}
-        margin={{
-          left: -30,
-        }}
-        syncId='time'
-      >
-        <CartesianGrid
-          strokeDasharray='3'
-          vertical={false}
-          stroke='#ffffff2a'
-        />
-        <XAxis dataKey='time' />
-        <YAxis ticks={[0, 10, 15, 20, 25, 30]} />
-        <Tooltip content={<CustomTooltip />} />
-        <Legend />
-        <Line type='monotone' dataKey='temp' stroke='#d42d2d' dot={<></>} />
-      </LineChart>
-      <LineChart
-        data={dataLine}
-        height={300}
-        width={300}
-        margin={{
-          left: -30,
-        }}
-        syncId='time'
-      >
-        <CartesianGrid
-          strokeDasharray='3'
-          vertical={false}
-          stroke='#ffffff2a'
-        />
-        <XAxis dataKey='time' />
-        <YAxis ticks={[0, 15, 25, 30, 45, 60, 75, 90]} />
-        <Tooltip content={<CustomTooltip />} />
-        <Legend />
-        <Line type='monotone' dataKey='hum' stroke='#4b44d8' dot={<></>} />
-      </LineChart>
+      <ResponsiveContainer width='100%' height={300}>
+        <LineChart
+          data={dataLine}
+          margin={{
+            left: -30,
+          }}
+          syncId='time'
+        >
+          <CartesianGrid
+            strokeDasharray='3'
+            vertical={false}
+            stroke='#ffffff2a'
+          />
+          <XAxis dataKey='time' />
+          <YAxis ticks={[0, 10, 15, 20, 25, 30]} />
+          <Tooltip content={<CustomTooltip />} />
+          <Legend />
+          <Line type='monotone' dataKey='temp' stroke='#d42d2d' dot={<></>} />
+        </LineChart>
+      </ResponsiveContainer>
+      <ResponsiveContainer width='100%' height={300}>
+        <LineChart
+          data={dataLine}
+          height={300}
+          width={300}
+          margin={{
+            left: -30,
+          }}
+          syncId='time'
+        >
+          <CartesianGrid
+            strokeDasharray='3'
+            vertical={false}
+            stroke='#ffffff2a'
+          />
+          <XAxis dataKey='time' />
+          <YAxis ticks={[0, 15, 25, 30, 45, 60, 75, 90]} />
+          <Tooltip content={<CustomTooltip />} />
+          <Legend />
+          <Line type='monotone' dataKey='hum' stroke='#4b44d8' dot={<></>} />
+        </LineChart>
+      </ResponsiveContainer>
     </>
   );
 };

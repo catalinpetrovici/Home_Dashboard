@@ -8,15 +8,15 @@ const BookList = () => {
   return (
     <div ref={ref} className=''>
       <h1 className='title text-white'>Temp & Hum</h1>
-      <div className='flex flex-wrap'>
-        <section>
-          <div className='test inline-block'>
+      <div className='flex flex-col lg:flex-row'>
+        <section className='flex-1'>
+          <div className='test lg:mr-5'>
             <span className='mb-2 block'>Power Consumption</span>
             <BarCharts />
           </div>
         </section>
-        <section>
-          <div className='test mt-2 max-w-min lg:ml-10 lg:mt-0'>
+        <section className='flex-1'>
+          <div className='test'>
             <span className='mb-2 block'>Temp & Hum</span>
             <LineCharts />
           </div>
