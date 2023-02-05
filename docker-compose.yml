@@ -1,0 +1,73 @@
+version: '3.9'
+
+services:
+  home-react-frontend-app:
+    build: ./frontend
+    ports:
+      - 3000:3000
+    volumes:
+      - ./react/:/app
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - backend
+      - frontend
+
+  home-express-backend-app:
+    build: ./backend
+    depends_on:
+      home-db-redis-app:
+        condition: service_healthy
+      home-db-postgres-app:
+        condition: service_healthy
+    ports:
+      - 3000:3000
+    volumes:
+      - ./express/:/usr/src/app
+    environment:
+      - NODE_ENV=production
+      - PORT_SERVER=3000
+      - HOST_SERVER=http://localhost
+      - HOST_NODERED=http://192.168.0.124:1880
+      - HOST_CLIENT=localhost
+      - PORT_CLIENT=5173
+      - REDIS_URL=X
+      - POSTGRE_URL=X
+    networks:
+      - backend
+      - frontend
+
+  home-db-redis-app:
+    image: arm64v8/redis:6.0-bullseye
+    volumes:
+      - ./redis/conf:/usr/local/etc/redis
+    networks:
+      - backend
+    healthcheck:
+      test: ["redis-cli", "ping"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+  home-db-postgres-app:
+    image: postgres:15.1-bullseye
+    volumes:
+      - ./postgresql/data:/var/lib/postgresql/data
+    networks:
+      - backend
+    environment:
+      - name=value
+      - POSTGRES_USER=catalin
+      - POSTGRES_PASSWORD=catalin
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 1m30s
+      timeout: 30s
+      retries: 5
+      start_period: 30s
+
+networks:
+    backend:
+    frontend:

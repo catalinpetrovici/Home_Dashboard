@@ -1,0 +1,35 @@
+FROM arm64v8/node:18.14 as base
+EXPOSE 8080
+ENV NODE_ENV=production
+WORKDIR /opt
+COPY package*.json ./
+RUN npm config list
+RUN npm ci && npm cache clean --force
+
+## Stage 2
+FROM base as dev
+ENV NODE_ENV=development
+ENV PATH=/opt/node_modules/.bin:$PATH
+WORKDIR /opt
+RUN npm config list
+RUN npm install --only=dev
+WORKDIR /opt/app
+CMD ["nodemon", "./bin/www", "--inspect=0.0.0.0:9229"]
+
+## Stage 3
+FROM base as source
+WORKDIR /opt/app
+COPY . .
+
+## Stage 4
+FROM source as test
+ENV NODE_ENV=development
+ENV PATH=/opt/node_modules/.bin:$PATH
+COPY --from=dev /opt/node_modules /opt/node_modules
+RUN eslint .
+RUN npm test
+
+## Stage 5(default, production)
+FROM source as prod
+USER node
+CMD ["node", "./bin/www"]

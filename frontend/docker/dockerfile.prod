@@ -1,7 +1,13 @@
 FROM node as react-build
+RUN apt-get update
+
 WORKDIR /app
-COPY package.json .
-RUN yarn install --production --frozen-lockfile
+COPY package.json ./
+
+RUN mkdir app && chown -R node:node .
+USER node
+
+RUN npm install --production && npm cache clean --force
 ARG VITE_NODE_ENV
 # RUN if [ "$NODE_ENV" = "development" ]; \
 #         then yarn install; \
@@ -12,7 +18,7 @@ ARG VITE_SERVER_TEST
 ENV VITE_SERVER_TEST=$VITE_SERVER_TEST
 ARG VITE_SERVER_HOST
 ENV VITE_SERVER_HOST=$VITE_SERVER_HOST
-RUN yarn build
+RUN npm build
 
 FROM nginx
 COPY --from=react-build /app/dist /usr/share/nginx/html
@@ -20,8 +26,17 @@ COPY --from=react-build /app/dist /usr/share/nginx/html
 # docker build --file=dockerfile.prod -t frontend-dashboard-prod .
 
 # docker-compose -f docker-compose-prod.yml up -d --build
+# docker-compose build --no-cache
 
 # docker image ls
 # docker rmi <ID> -f
 
-# docker inspect <container-name>
+# docker inspect <container-name
+
+# docker-compose exec -u root
+
+# docker run --init -d <app>
+
+# docker ps -l => shows last container that ran
+
+# docker-compose run <app> npm install

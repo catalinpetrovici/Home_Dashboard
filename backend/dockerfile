@@ -1,0 +1,33 @@
+FROM arm64v8/node:18.14-alpine as base
+EXPOSE 8080
+ENV NODE_ENV=production
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm config list
+RUN npm ci && npm cache clean --force
+
+## Stage 2
+FROM base as dev
+ENV NODE_ENV=development
+WORKDIR /usr/src/app
+RUN npm config list
+RUN npm install --only=dev
+WORKDIR /usr/src/app
+CMD ["nodemon", "./bin/www", "--inspect=0.0.0.0:9229"]
+
+## Stage 3
+FROM base as source
+WORKDIR /usr/src/app
+COPY . .
+
+## Stage 4
+FROM source as test
+ENV NODE_ENV=development
+COPY --from=dev WORKDIR /usr/src/app/node_modules /usr/src/app/node_modules/
+RUN eslint .
+RUN npm test
+
+## Stage 5(default, production)
+FROM source as prod
+USER node
+CMD ["node", "./bin/www"]
