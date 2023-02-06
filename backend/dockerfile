@@ -1,29 +1,29 @@
 FROM arm64v8/node:18.14-alpine as base
-EXPOSE 8080
+RUN apk update && apk add bash
+EXPOSE 3000
 ENV NODE_ENV=production
-WORKDIR /usr/src/app
-COPY package*.json ./
+WORKDIR /app
+COPY ./package*.json ./
 RUN npm config list
 RUN npm ci && npm cache clean --force
 
 ## Stage 2
-FROM base as dev
-ENV NODE_ENV=development
-WORKDIR /usr/src/app
-RUN npm config list
-RUN npm install --only=dev
-WORKDIR /usr/src/app
-CMD ["nodemon", "./bin/www", "--inspect=0.0.0.0:9229"]
+FROM base as source
+WORKDIR /app
+COPY . .
 
 ## Stage 3
-FROM base as source
-WORKDIR /usr/src/app
-COPY . .
+FROM source as dev
+ENV NODE_ENV=development
+WORKDIR /app
+RUN npm config list
+RUN npm install && npm cache clean --force
+CMD ["npm", "run", "dev"]
 
 ## Stage 4
 FROM source as test
 ENV NODE_ENV=development
-COPY --from=dev WORKDIR /usr/src/app/node_modules /usr/src/app/node_modules/
+COPY --from=dev WORKDIR /app/node_modules /app/node_modules/
 RUN eslint .
 RUN npm test
 
