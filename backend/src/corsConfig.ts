@@ -18,3 +18,8 @@ export const corsConfig = {
     }
   },
 };
+
+// app.use(function (req, res, next) {
+//   req.headers.origin = req.headers.origin || `http://${req.headers.host}`;
+//   next();
+// });
