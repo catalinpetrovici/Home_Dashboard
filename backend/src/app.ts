@@ -5,6 +5,7 @@ import express from 'express';
 import morgan from 'morgan';
 import helmet from 'helmet';
 import cors from 'cors';
+import passport from 'passport';
 
 import { corsConfig } from './corsConfig';
 
@@ -25,6 +26,8 @@ app.use(helmet());
 app.use(cors(corsConfig));
 app.use(express.json());
 app.use(middleware.session);
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use('/api/v1', dashboardRouter);
 
