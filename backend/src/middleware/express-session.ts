@@ -4,14 +4,6 @@ import { redisClient } from '../db/redis';
 
 const RedisStore = connectRedis(session);
 
-redisClient.connect().catch((error) => {
-  console.error(`\n❌❌❌ Redis: Failed to connect to database!💩 ${error}`);
-});
-redisClient.on('connect', () => {
-  console.log('✅✅✅ Redis: Connected successfully!💃');
-});
-redisClient.set('connected', 'successfully');
-
 export default session({
   name: 'sessionId',
   secret: 'mySecret',

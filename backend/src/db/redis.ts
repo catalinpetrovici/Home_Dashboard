@@ -5,3 +5,11 @@ export const redisClient = createClient({
   password: process.env.REDIS_PASSWORD,
   legacyMode: true,
 });
+
+redisClient.connect().catch((error) => {
+  console.error(`\n❌❌❌ Redis: Failed to connect to database!💩 ${error}`);
+});
+redisClient.on('connect', () => {
+  console.log('✅✅✅ Redis: Connected successfully!💃');
+});
+redisClient.set('connected', 'successfully');

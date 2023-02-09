@@ -1,4 +1,5 @@
 import * as z from 'zod';
+import { Role } from '@prisma/client';
 
 export const Login = z.object({
   email: z
@@ -16,7 +17,7 @@ export const Register = z.object({
   id: z.string().optional(),
   verificationCode: z.string().optional(),
   updatedAt: z.string().optional(),
-  role: z.string().optional(),
+  role: z.nativeEnum(Role).optional(),
   email: z
     .string({
       required_error: 'email is required',

@@ -10,21 +10,37 @@ datasource db {
   url      = env("POSTGRE_URL")
 }
 
+// https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference
+
 model User {
-  id               String       @id @default(uuid())
-  createdAt        DateTime     @default(now())
-  updatedAt        DateTime
-  username         String       @unique @db.VarChar(20)
-  email            String       @unique
-  password         String
-  isAdmin          Boolean      @default(false)
-  confirmationCode String       @unique
-  emailConfirmed   Boolean      @default(false)
-  profile          UserProfile?
+  id               String          @id @default(uuid())
+  createdAt        DateTime        @default(now()) @map("created_at")
+  updatedAt        DateTime        @updatedAt @map("updated_at")
+  lastName         String          @unique @map("last_name") @db.VarChar(20)
+  firstName        String          @unique @map("first_name") @db.VarChar(20)
+  email            String          @unique
+  phoneNumber      String          @unique @map("phone_number")
+  password         String          @unique
+  role             Role            @default(UNVERIFIED)
+  verificationCode String?         @map("verification_code")
+  userPreference   UserPreference? @relation(fields: [userPreferenceId], references: [id])
+  userPreferenceId String?         @unique @map("user_preference_id")
+
+  @@index([email])
+  @@map("user")
 }
 
-model UserProfile {
-  user     User    @relation(fields: [id], references: [id])
-  id       String  @unique
-  darkMode Boolean @default(true)
+model UserPreference {
+  id       String  @id @default(uuid())
+  darkMode Boolean @default(true) @map("dark_mode")
+  user     User?
+
+  @@map("user_preference")
+}
+
+enum Role {
+  BASIC
+  ADMIN
+  UNVERIFIED
+  LOST
 }

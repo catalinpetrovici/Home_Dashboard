@@ -1,8 +1,9 @@
-import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
 import APIError from '../../errors/api-errors';
 import { StatusCodes } from 'http-status-codes';
 import u from '../../utils';
+import db from '../../db/prisma';
+import { Role } from '@prisma/client';
 import crypto from 'crypto';
 import {
   Login,
@@ -12,7 +13,6 @@ import {
   ResetPassword,
 } from './auth.models';
 
-const prisma = new PrismaClient();
 //
 // ########## login
 //
@@ -22,14 +22,10 @@ export async function login(req: Request, res: Response) {
   const { email, password: userPassword } = await Login.parseAsync(req.body);
 
   // Get password, id and from the database
-  // TODO PRISMA
-  const user = '';
-  // await AuthModel.findOne(
-  //   {
-  //     email,
-  //   },
-  //   ['id', 'password', 'role']
-  // );
+  const user = await db.user.findUnique({
+    where: { email },
+    select: { id: true, password: true, role: true },
+  });
 
   // Throw an error if the user doesn't exist
   if (!user) {
@@ -38,7 +34,7 @@ export async function login(req: Request, res: Response) {
     );
   }
 
-  const { password: databasePassword, id, role } = user;
+  const { id, role, password: databasePassword } = user;
 
   // Compare passwords
   const passwordIsCorrect = await u.comparePassword(
@@ -52,7 +48,7 @@ export async function login(req: Request, res: Response) {
       'These credentials do not match our records!'
     );
 
-  if (role === 'UNVERIFIED')
+  if (role === Role.UNVERIFIED)
     throw new APIError.Unauthenticated('Email is not verified!');
 
   // Store the session in redis and send the cookie
@@ -74,9 +70,10 @@ export async function register(req: Request, res: Response) {
   const { email, password, firstName } = user;
 
   // Check email if exist
-  // TODO PRISMA
-  const emailCheckExist = '';
-  // await AuthModel.findOne({ email }, ['id', 'email']);
+  const emailCheckExist = await db.user.findUnique({
+    where: { email },
+    select: { id: true },
+  });
 
   // Throw an error if email exits
   if (emailCheckExist) {
@@ -100,12 +97,13 @@ export async function register(req: Request, res: Response) {
   // });
 
   // Insert the date into the database
-  // TODO PRISMA
-  // await AuthModel.create({
-  //   ...user,
-  //   password: passwordEncrypted,
-  //   verificationCode: verificationCode,
-  // });
+  await db.user.create({
+    data: {
+      ...user,
+      password: passwordEncrypted,
+      verificationCode,
+    },
+  });
 
   // Response
   res.status(StatusCodes.CREATED).json({
@@ -139,26 +137,32 @@ const verifyEmail = async (req: Request, res: Response) => {
   const { verificationToken, email } = await VerifyEmail.parseAsync(req.body);
 
   // Get the ID and verificationCode parameters of the user
-  // TODO PRISMA
-  const { id, verificationCode } = { id: '', verificationCode: '' };
-  // const { id, verificationCode } = await AuthModel.findOne({ email }, [
-  //   'id',
-  //   'verificationCode',
-  // ]);
+  const user = await db.user.findUnique({
+    where: { email },
+    select: { verificationCode: true },
+  });
 
-  // Throw error if the user doesn't exist
-  if (!id) throw new APIError.Unauthenticated('Verification Failed');
+  // Throw an error if the user doesn't exist
+  if (!user) {
+    throw new APIError.BadRequestError('Verification Failed!');
+  }
+
+  const { verificationCode } = user;
 
   // Throw error if the user token is invalid
   if (verificationToken !== verificationCode)
     throw new APIError.Unauthenticated('Verification Failed');
 
   // Update the role and verificationCode of the user
-  // TODO PRISMA
-  // await AuthModel.updateOne(
-  //   { email },
-  //   { role: 'VERIFIED', verificationCode: null }
-  // );
+  await db.user.update({
+    where: {
+      email,
+    },
+    data: {
+      role: Role.BASIC,
+      verificationCode: null,
+    },
+  });
 
   // Response
   res.status(StatusCodes.OK).json({ msg: 'Email Verified!' });
@@ -173,21 +177,21 @@ const forgotPassword = async (req: Request, res: Response) => {
   const { email } = await ForgotPassword.parseAsync(req.body);
 
   // Get the ID and firstName parameters of the user
-  // TODO PRISMA
-  const { id, firstName } = { id: '', firstName: '' };
-  // const { id, firstName } = await AuthModel.findOne({ email }, [
-  //   'id',
-  //   'firstName',
-  // ]);
+  const user = await db.user.findUnique({
+    where: { email },
+    select: { id: true, firstName: true },
+  });
 
   // Throw error if the user doesn't exist
-  if (!id) throw new APIError.BadRequestError('Please provide valid email');
+  if (!user) throw new APIError.BadRequestError('Please provide valid email');
+
+  const { id, firstName } = user;
 
   // Generate the passwordToken
   const verificationCode = crypto.randomBytes(10).toString('hex');
 
   // Set a expiration date for token
-  const tenMinutes = 10;
+  const tenMinutes = 1;
   const passwordTokenExpirationDate = u.inMinutes(tenMinutes);
 
   // Send email
@@ -200,15 +204,16 @@ const forgotPassword = async (req: Request, res: Response) => {
   // });
 
   // Update the role and verificationCode of the user
-  // TODO PRISMA
-  // await AuthModel.updateOne(
-  //   { email },
-  //   {
-  //     role: 'LOST',
-  //     verificationCode: verificationCode,
-  //     updatedAt: passwordTokenExpirationDate,
-  //   }
-  // );
+  await db.user.update({
+    where: {
+      email,
+    },
+    data: {
+      role: Role.LOST,
+      verificationCode,
+      updatedAt: passwordTokenExpirationDate,
+    },
+  });
 
   // Response
   res
@@ -226,13 +231,17 @@ const resetPassword = async (req: Request, res: Response) => {
     req.body
   );
 
+  // Get the ID and firstName parameters of the user
+  const user = await db.user.findUnique({
+    where: { email },
+    select: { verificationCode: true, updatedAt: true },
+  });
+
+  // Throw error if the user doesn't exist
+  if (!user) throw new APIError.BadRequestError('Please provide valid email');
+
   // Get the verification_code and updated_at parameters of the user
-  const { verificationCode, updatedAt: tokenExpirationDate } = {
-    verificationCode: '',
-    updatedAt: '',
-  };
-  // TODO PRISMA
-  // await AuthModel.findOne({ email }, ['verificationCode', 'updatedAt']);
+  const { verificationCode, updatedAt: tokenExpirationDate } = user;
 
   // Throw error if token is invalid
   if (!tokenExpirationDate)
@@ -245,19 +254,27 @@ const resetPassword = async (req: Request, res: Response) => {
     throw new APIError.BadRequestError('Verification Token is invalid');
 
   // Compare expiration date for token and verification code
-  const currentDate = String(new Date());
-  if (tokenExpirationDate > currentDate)
+  const currentDate = new Date();
+  console.log(tokenExpirationDate.getTime(), currentDate.getTime());
+  console.log(tokenExpirationDate.getTime() < currentDate.getTime());
+  console.log(tokenExpirationDate.getTime() > currentDate.getTime());
+  if (tokenExpirationDate.getTime() < currentDate.getTime())
     throw new APIError.BadRequestError('Verification Token is expired!');
 
   // Encrypt the password
   const passwordEncrypted = await u.generatePassword(password);
 
   // Update user
-  // TODO PRISMA
-  // await AuthModel.updateOne(
-  //   { email },
-  //   { role: 'VERIFIED', verificationCode: null, password: passwordEncrypted }
-  // );
+  await db.user.update({
+    where: {
+      email,
+    },
+    data: {
+      role: Role.BASIC,
+      verificationCode: null,
+      password: passwordEncrypted,
+    },
+  });
 
   // Response
   res.status(StatusCodes.NO_CONTENT);
