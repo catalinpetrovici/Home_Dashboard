@@ -8,6 +8,7 @@ export const redisClient = createClient({
 
 redisClient.connect().catch((error) => {
   console.error(`\n❌❌❌ Redis: Failed to connect to database!💩 ${error}`);
+  process.exit(1);
 });
 redisClient.on('connect', () => {
   console.log('✅✅✅ Redis: Connected successfully!💃');

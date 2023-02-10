@@ -8,7 +8,7 @@ const whitelist = [
 ];
 
 export const corsConfig = {
-  // credentials: true,
+  credentials: true,
   origin: function (origin: any, callback: any) {
     console.log('origin', origin);
     if (whitelist.indexOf(origin) !== -1) {

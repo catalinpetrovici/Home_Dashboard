@@ -24,7 +24,7 @@ const app = express();
 
 app.use(morgan('dev'));
 app.use(helmet());
-// app.use(cors(corsConfig));
+app.use(cors(corsConfig));
 app.use(express.json());
 app.use(middleware.session);
 app.use(passport.initialize());

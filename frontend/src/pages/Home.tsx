@@ -4,6 +4,7 @@ import { WiHumidity } from 'react-icons/wi';
 import { useRef, useLayoutEffect, useState } from 'react';
 import axiosIns from '../utils/axios';
 import { useQuery, useMutation } from '@tanstack/react-query';
+import { Navigate } from 'react-router-dom';
 
 const fetchData = async () => {
   const res = await axiosIns.get('/api/v1/nowtemp');
@@ -34,21 +35,29 @@ const COLORS2 = [
   { start: '#5998E760', end: '#4E69DC60' },
 ];
 
+interface IApiError {
+  message: string;
+  description: string;
+  statusCode: string | number;
+}
+
 const Home = () => {
   const ref = useRef<HTMLDivElement>(null);
 
-  const { status, data, isLoading, isError } = useQuery(
-    ['temp', 'now'],
-    fetchData
-  );
+  const { status, data, isLoading, isError, error } = useQuery({
+    queryKey: ['temp', 'now'],
+    queryFn: fetchData,
+    onError: (err: IApiError) => err,
+  });
+
+  console.log(error);
 
   if (isLoading) {
     return <h1 className='title text-white'>Loading...</h1>;
   }
+
   if (isError) {
-    return (
-      <h1 className='title text-white'>Error! Please contact the host.</h1>
-    );
+    return <Navigate to={'/login'} replace />;
   }
 
   return (

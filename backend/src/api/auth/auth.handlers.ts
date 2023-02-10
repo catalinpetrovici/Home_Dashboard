@@ -1,17 +1,12 @@
+// prettier-ignore
+import { Login, Register, VerifyEmail, ForgotPassword, ResetPassword } from './auth.models';
 import { Request, Response } from 'express';
 import APIError from '../../errors/api-errors';
-import { StatusCodes } from 'http-status-codes';
+import StatusCodes from '../../interfaces/types/http.model';
 import u from '../../utils';
 import db from '../../db/prisma';
 import { Role } from '@prisma/client';
 import crypto from 'crypto';
-import {
-  Login,
-  Register,
-  VerifyEmail,
-  ForgotPassword,
-  ResetPassword,
-} from './auth.models';
 
 //
 // ########## login
@@ -24,7 +19,7 @@ export async function login(req: Request, res: Response) {
   // Get password, id and from the database
   const user = await db.user.findUnique({
     where: { email },
-    select: { id: true, password: true, role: true },
+    select: { id: true, password: true, role: true, firstName: true },
   });
 
   // Throw an error if the user doesn't exist
@@ -34,7 +29,7 @@ export async function login(req: Request, res: Response) {
     );
   }
 
-  const { id, role, password: databasePassword } = user;
+  const { id, firstName, role, password: databasePassword } = user;
 
   // Compare passwords
   const passwordIsCorrect = await u.comparePassword(
@@ -52,7 +47,7 @@ export async function login(req: Request, res: Response) {
     throw new APIError.Unauthenticated('Email is not verified!');
 
   // Store the session in redis and send the cookie
-  req.session.user = { id, role };
+  req.session.user = { id, role, firstName };
 
   // Response
   res.status(StatusCodes.OK).json({
@@ -255,9 +250,6 @@ const resetPassword = async (req: Request, res: Response) => {
 
   // Compare expiration date for token and verification code
   const currentDate = new Date();
-  console.log(tokenExpirationDate.getTime(), currentDate.getTime());
-  console.log(tokenExpirationDate.getTime() < currentDate.getTime());
-  console.log(tokenExpirationDate.getTime() > currentDate.getTime());
   if (tokenExpirationDate.getTime() < currentDate.getTime())
     throw new APIError.BadRequestError('Verification Token is expired!');
 

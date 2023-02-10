@@ -8,7 +8,7 @@ import CustomLink from './CustomLink';
 const NavBar = () => {
   const menus = [
     { name: 'home', link: '/', Icon: AiOutlineHome },
-    { name: 'analytics', link: '/books', Icon: TbReportAnalytics },
+    { name: 'analytics', link: '/dash', Icon: TbReportAnalytics },
     { name: 'dashboard', link: '/dashboard', Icon: MdOutlineDashboard },
     { name: 'File Manager', link: '/folder', Icon: FiFolder },
     { name: 'Saved', link: '/save', Icon: AiOutlineHeart },

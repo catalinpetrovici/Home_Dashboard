@@ -11,6 +11,7 @@ async function connectToDatabase() {
     console.error(
       `\n❌❌❌ PostgreSQL: Failed to connect to database!💩 ${error}`
     );
+    process.exit(1);
   }
 }
 

@@ -2,6 +2,15 @@
 @tailwind components;
 @tailwind utilities;
 
+.form-label { 
+  @apply block tracking-wide mb-2;
+}
+
+
+.input {
+  @apply bg-white/30 text-black border-solid border-2 border-gray-300 shadow rounded-md p-3 w-full text-base leading-5 mb-2 tracking-wide valid:border-green-600/30
+}
+
 /* .centerMobile {
   margin-right: auto;
     margin-left: auto;
