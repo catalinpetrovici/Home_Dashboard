@@ -11,6 +11,7 @@ export const Login = z.object({
     required_error: 'Password is required',
     invalid_type_error: 'Password must be a string',
   }),
+  keepMe: z.boolean().optional(),
 });
 
 export const Register = z.object({

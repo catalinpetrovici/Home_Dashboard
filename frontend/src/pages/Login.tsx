@@ -1,12 +1,11 @@
-import React, { useRef, useState } from 'react';
+import React, { useRef } from 'react';
 import LabelInput from '../components/Auth/InputLabel';
 import PasswordLabelInput from '../components/Auth/PasswordInputLabel';
 import ButtonSubmit from '../components/Auth/ButtonSubmit';
 import { useMutation } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
-import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import axiosIns from '../utils/axios';
-import AuthContext from '../context/AuthProvider';
 
 const Login = () => {
   const navigate = useNavigate();
@@ -15,6 +14,8 @@ const Login = () => {
 
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
+  // @ts-ignore
+  const checkBoxRef = useRef<HTMLInputElement>(false);
 
   async function registerUser(object: object) {
     try {
@@ -43,6 +44,7 @@ const Login = () => {
       const userInput = {
         email: emailRef.current.value,
         password: passwordRef.current.value,
+        keepMe: checkBoxRef.current.checked,
       };
 
       mutateAsync({ ...userInput });
@@ -71,8 +73,9 @@ const Login = () => {
                 name='remember'
                 id='remember-me'
                 className='accent-green-600'
+                ref={checkBoxRef}
               />
-              <label htmlFor='remember-me' className='ml-2 block'>
+              <label className='ml-2 block' htmlFor='remember-me'>
                 {' '}
                 Keep me signed in{' '}
               </label>

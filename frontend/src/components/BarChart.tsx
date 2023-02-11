@@ -8,14 +8,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import axiosIns from '../utils/axios';
-import { useEffect, useState } from 'react';
-
-const fetchDataBarChart = async () => {
-  const res = await axiosIns.get('/api/v1/charts');
-  return res.data;
-};
+import { useEffect } from 'react';
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   let customLabel;
@@ -42,29 +35,7 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-const BarCharts = ({ className }: any) => {
-  const [dataBar, setDataBar] = useState([]);
-
-  const { status, data, isLoading, isError } = useQuery(
-    ['chart', 'Wh'],
-    fetchDataBarChart
-  );
-
-  useEffect(() => {
-    if (!isLoading) {
-      setDataBar(data);
-    }
-  }, [data]);
-
-  if (isLoading) {
-    return <h1 className='title text-white'>Loading...</h1>;
-  }
-  if (isError) {
-    return (
-      <h1 className='title text-white'>Error! Please contact the host.</h1>
-    );
-  }
-
+const BarCharts = ({ className, data }: any) => {
   return (
     <ResponsiveContainer width='100%' height={300}>
       <BarChart

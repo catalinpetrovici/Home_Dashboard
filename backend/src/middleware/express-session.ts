@@ -14,7 +14,7 @@ export default session({
     disableTouch: true,
   }),
   cookie: {
-    maxAge: 1000 * 60 * 60, // session max age in milliseconds
+    maxAge: 1000 * 60 * 2, // session max age in milliseconds
     httpOnly: true,
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     secure: process.env.NODE_ENV === 'production' ? true : 'auto',

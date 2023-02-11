@@ -1,12 +1,14 @@
 import { useRef, useLayoutEffect, useState, useEffect } from 'react';
 import RangeInput from '../components/RangeInput';
 import CheckBoxInput from '../components/CheckBoxInput';
-import { useQuery, useMutation } from '@tanstack/react-query';
+import { useQuery, useMutation, QueryClient } from '@tanstack/react-query';
 import axiosIns from '../utils/axios';
 import axios from 'axios';
+import { useLoaderData } from 'react-router-dom';
 
 const fetchData = async () => {
   const res = await axiosIns.get('/api/v1');
+  console.log('refetch');
   return res.data;
 };
 
@@ -16,8 +18,18 @@ export const sentCommand = async (data: any) => {
   await axiosIns.post(`/api/v1/led`, data);
 };
 
+type Data = {
+  id: string;
+  lastChange: string;
+  name: string;
+  tab: string;
+  type: string;
+  value: string;
+  setupRange?: { step: number; min: number; max: number };
+};
+
 const Dashboard = () => {
-  const { status, data, isLoading, isError } = useQuery(['data'], fetchData);
+  const data = useLoaderData() as Data[];
 
   const sendCommandMutation = useMutation(sentCommand);
 
@@ -26,15 +38,6 @@ const Dashboard = () => {
     id: string
   ) {
     sendCommandMutation.mutate({ value, id });
-  }
-
-  if (isLoading) {
-    return <h1 className='title text-white'>Loading...</h1>;
-  }
-  if (isError) {
-    return (
-      <h1 className='title text-white'>Error! Please contact the host.</h1>
-    );
   }
 
   return (
@@ -173,3 +176,18 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+export function loader(queryClient: QueryClient) {
+  return async () => {
+    const data = queryClient.fetchQuery({
+      queryKey: ['dashboard', 'slider&switch'],
+      queryFn: fetchData,
+    });
+    if (data) return data;
+
+    return queryClient.fetchQuery({
+      queryKey: ['dashboard', 'slider&switch'],
+      queryFn: () => {},
+    });
+  };
+}

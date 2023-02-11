@@ -14,7 +14,11 @@ import crypto from 'crypto';
 
 export async function login(req: Request, res: Response) {
   // Validate the input with zod
-  const { email, password: userPassword } = await Login.parseAsync(req.body);
+  const {
+    email,
+    password: userPassword,
+    keepMe,
+  } = await Login.parseAsync(req.body);
 
   // Get password, id and from the database
   const user = await db.user.findUnique({
@@ -43,16 +47,22 @@ export async function login(req: Request, res: Response) {
       'These credentials do not match our records!'
     );
 
+  // Throw an error if the user email is not verified
   if (role === Role.UNVERIFIED)
     throw new APIError.Unauthenticated('Email is not verified!');
 
   // Store the session in redis and send the cookie
   req.session.user = { id, role, firstName };
 
+  // Set maxAge of session cookie to a day if keepMe is true
+  if (keepMe) req.session.cookie.maxAge = 25 * 60 * 60 * 1000;
+
+  //
   const authenticatedCookie = Buffer.from(
     `{ "authenticated": true, "role": "${role}" }`
   ).toString('base64');
 
+  console.log('login');
   // Response
   res
     .cookie('authenticated', authenticatedCookie, {

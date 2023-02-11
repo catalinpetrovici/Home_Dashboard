@@ -1,6 +1,3 @@
-import { useEffect, useState } from 'react';
-import axiosIns from '../utils/axios';
-import { useQuery } from '@tanstack/react-query';
 import {
   LineChart,
   Line,
@@ -9,14 +6,8 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
-  Brush,
   ResponsiveContainer,
 } from 'recharts';
-
-const fetchDataBarChart = async () => {
-  const res = await axiosIns.get('/api/v1/temp');
-  return res.data;
-};
 
 const CustomTooltip = ({ active, payload, label }: any) => {
   let custom;
@@ -44,34 +35,12 @@ const CustomTooltip = ({ active, payload, label }: any) => {
   return null;
 };
 
-const LineCharts = ({ className }: any) => {
-  const [dataLine, setDataLine] = useState([]);
-
-  const { status, data, isLoading, isError } = useQuery(
-    ['chart', 'tempHum'],
-    fetchDataBarChart
-  );
-
-  useEffect(() => {
-    if (!isLoading) {
-      setDataLine(data);
-    }
-  }, [data]);
-
-  if (isLoading) {
-    return <h1 className='title text-white'>Loading...</h1>;
-  }
-  if (isError) {
-    return (
-      <h1 className='title text-white'>Error! Please contact the host.</h1>
-    );
-  }
-
+const LineCharts = ({ className, data }: any) => {
   return (
     <>
       <ResponsiveContainer width='100%' height={300}>
         <LineChart
-          data={dataLine}
+          data={data}
           margin={{
             left: -30,
           }}
@@ -91,7 +60,7 @@ const LineCharts = ({ className }: any) => {
       </ResponsiveContainer>
       <ResponsiveContainer width='100%' height={300}>
         <LineChart
-          data={dataLine}
+          data={data}
           height={300}
           width={300}
           margin={{

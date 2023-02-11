@@ -18,14 +18,14 @@ const PrivateRoute = ({ children, ...rest }: any) => {
   if (base64String) {
     user = JSON.parse(window.atob(base64String)) as User;
   }
-
   const location = useLocation();
-  console.log(user);
+
+  console.log('private');
 
   return user?.authenticated ? (
     <Outlet />
   ) : user?.role === 'UNVERIFIED' ? (
-    <Navigate to='/unauthorized' state={{ from: location }} replace />
+    <Navigate to='/login' state={{ from: location }} replace />
   ) : (
     <Navigate to='/login' state={{ from: location }} replace />
   );
