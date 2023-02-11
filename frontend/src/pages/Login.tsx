@@ -4,21 +4,24 @@ import PasswordLabelInput from '../components/Auth/PasswordInputLabel';
 import ButtonSubmit from '../components/Auth/ButtonSubmit';
 import { useMutation } from '@tanstack/react-query';
 import axios, { AxiosError } from 'axios';
-import { Link, Navigate, useNavigate } from 'react-router-dom';
+import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
 import axiosIns from '../utils/axios';
+import AuthContext from '../context/AuthProvider';
 
 const Login = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/';
+
   const emailRef = useRef<HTMLInputElement>(null);
   const passwordRef = useRef<HTMLInputElement>(null);
 
   async function registerUser(object: object) {
     try {
       const { data } = await axiosIns.post('/api/v1/auth/login', object);
-      if (data)
-        setTimeout(() => {
-          navigate('/');
-        }, 1 * 1000);
+      setTimeout(() => {
+        navigate(from, { replace: true });
+      }, 2 * 1000);
       return data;
     } catch (error: any) {
       if (axios.isAxiosError(error)) {

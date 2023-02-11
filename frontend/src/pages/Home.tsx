@@ -1,10 +1,7 @@
 import PieCharts from '../components/PieChart';
-import { CiTempHigh } from 'react-icons/ci';
-import { WiHumidity } from 'react-icons/wi';
-import { useRef, useLayoutEffect, useState } from 'react';
+import { useRef } from 'react';
 import axiosIns from '../utils/axios';
-import { useQuery, useMutation } from '@tanstack/react-query';
-import { Navigate } from 'react-router-dom';
+import { useQuery } from '@tanstack/react-query';
 
 const fetchData = async () => {
   const res = await axiosIns.get('/api/v1/nowtemp');
@@ -57,7 +54,9 @@ const Home = () => {
   }
 
   if (isError) {
-    return <Navigate to={'/login'} replace />;
+    return (
+      <h1 className='title text-white'>Error! Please contact the host.</h1>
+    );
   }
 
   return (
@@ -77,19 +76,19 @@ const Home = () => {
             <span className='mb-2 block text-[#ffffff72]'>Inside</span>
             <div className='inline-block'>
               <span className='mr-3'>
-                <CiTempHigh
+                {/* <CiTempHigh
                   size={30}
                   className='inline-block text-[#fe696972]'
-                />
+                /> */}
                 {data.tempInside}
               </span>
             </div>
             <div className='inline-block'>
               <span>
-                <WiHumidity
+                {/* <WiHumidity
                   size={35}
                   className='inline-block text-[#556cff72]'
-                />
+                /> */}
                 {data.humInside}
               </span>
             </div>
@@ -98,23 +97,23 @@ const Home = () => {
             <span className='mb-2 block  text-[#ffffff72]'>Outside</span>
             <div className='inline-block'>
               <span className='mr-3'>
-                <CiTempHigh
+                {/* <CiTempHigh
                   size={30}
                   className={`inline-block ${
                     data.tempOutside > 0
                       ? 'text-[#fe696972]'
                       : 'text-[#557aff72]'
                   } `}
-                />
+                /> */}
                 {data.tempOutside}
               </span>
             </div>
             <div className='inline-block'>
               <span>
-                <WiHumidity
+                {/* <WiHumidity
                   size={35}
                   className='inline-block text-[#556cff72]'
-                />
+                /> */}
                 {data.humOutside}
               </span>
             </div>
@@ -137,3 +136,13 @@ const Home = () => {
 };
 
 export default Home;
+
+// export function loader() {
+//   const { data } = useQuery({
+//     queryKey: ['temp', 'now'],
+//     queryFn: fetchData,
+//     onError: (err: IApiError) => err,
+//   });
+
+//   return data;
+// }

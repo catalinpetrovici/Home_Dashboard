@@ -49,10 +49,19 @@ export async function login(req: Request, res: Response) {
   // Store the session in redis and send the cookie
   req.session.user = { id, role, firstName };
 
+  const authenticatedCookie = Buffer.from(
+    `{ "authenticated": true, "role": "${role}" }`
+  ).toString('base64');
+
   // Response
-  res.status(StatusCodes.OK).json({
-    message: 'Success! Login!',
-  });
+  res
+    .cookie('authenticated', authenticatedCookie, {
+      maxAge: req.session.cookie.maxAge,
+    })
+    .status(StatusCodes.OK)
+    .json({
+      message: 'Success! Login!',
+    });
 }
 
 //
