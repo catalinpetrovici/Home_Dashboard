@@ -27,7 +27,7 @@ const app = express();
 app.disable('x-powered-by');
 app.use(morgan('dev'));
 app.use(helmet());
-// app.use(cors(corsConfig));
+app.use(cors(corsConfig));
 app.use(express.json());
 app.use(middleware.session);
 app.use(passport.initialize());
@@ -38,7 +38,6 @@ app.use('/api/v1', dashboardRouter);
 app.use('/api/v1/auth', middleware.limiter.accountLimiter, authRouter);
 
 app.use(middleware.notFound);
-app.use(middleware.errorHandler);
 app.use(middleware.errorHandler);
 
 export default app;

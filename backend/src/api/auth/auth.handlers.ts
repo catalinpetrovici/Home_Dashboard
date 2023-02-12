@@ -127,7 +127,7 @@ export async function register(req: Request, res: Response) {
   // await u.email.sendEmailHandlebars({
   //   firstName,
   //   email,
-  //   subject: 'CaierSpace verification email',
+  //   subject: 'Verification email',
   //   verificationLink: origin,
   //   templateEmail: 'verificationEmail',
   // });

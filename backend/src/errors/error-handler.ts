@@ -9,7 +9,7 @@ class ErrorHandler {
     // SEND EMAIL
     // SEND NOTIFICATIONS
     console.log(
-      'ErrorHandler: Verific aceasta erroare de tip uncaughtException! ',
+      'ErrorHandler: Uncaught Exception! Not caught by a programming construct or by the programmer!',
       err,
       err.stack
     );
@@ -23,4 +23,4 @@ class ErrorHandler {
   }
 }
 
-export const errorHandler = new ErrorHandler();
+export const errorHandlerIns = new ErrorHandler();

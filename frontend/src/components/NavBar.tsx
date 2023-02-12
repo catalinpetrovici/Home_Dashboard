@@ -16,8 +16,6 @@ const NavBar = () => {
     { name: 'Setting', link: '/settings', Icon: RiSettings4Line },
   ];
 
-  console.log('DEV MODE:', import.meta.env.DEV);
-  console.log('PROD MODE:', import.meta.env.PROD);
   console.log('MODE:', import.meta.env.MODE);
 
   return (
@@ -44,7 +42,9 @@ const NavBar = () => {
             })}
           </ul>
         </div>
-        {import.meta.env.DEV && <div className='cr'>DEV</div>}
+        {import.meta.env.MODE !== 'production' ? (
+          <div className='cr'>DEV</div>
+        ) : null}
       </div>
     </nav>
   );

@@ -1,14 +1,11 @@
 import { NextFunction, Request, Response } from 'express';
 import APIError from '../errors/api-errors';
 import { Role } from '@prisma/client';
-import HttpStatusCode from '../interfaces/types/http.model';
 
 export default function (...roles: Role[]) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!roles.includes(req?.session?.user?.role)) {
-      res
-        .status(HttpStatusCode.UNAUTHORIZED)
-        .send('Unauthorized to access this route');
+      throw new APIError.Unauthorized('Unauthorized to access this route');
     }
     next();
   };
