@@ -4,6 +4,7 @@ import session from './express-session';
 import authorize from './authorize';
 import authorizeRoles from './authorizeRoles';
 import limiter from './express-rate-limit';
+import userAgent from './express-useragent';
 
 export default {
   errorHandler,
@@ -12,4 +13,5 @@ export default {
   authorize,
   authorizeRoles,
   limiter,
+  userAgent,
 };

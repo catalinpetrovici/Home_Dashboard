@@ -3,12 +3,10 @@ import RangeInput from '../components/RangeInput';
 import CheckBoxInput from '../components/CheckBoxInput';
 import { useQuery, useMutation, QueryClient } from '@tanstack/react-query';
 import axiosIns from '../utils/axios';
-import axios from 'axios';
 import { useLoaderData } from 'react-router-dom';
 
 const fetchData = async () => {
   const res = await axiosIns.get('/api/v1');
-  console.log('refetch');
   return res.data;
 };
 

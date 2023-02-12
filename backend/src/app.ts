@@ -27,13 +27,13 @@ const app = express();
 app.disable('x-powered-by');
 app.use(morgan('dev'));
 app.use(helmet());
-app.use(cors(corsConfig));
+// app.use(cors(corsConfig));
 app.use(express.json());
 app.use(middleware.session);
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.get('/ip', (request, response) => response.send(request.ip));
+app.get('/ip', (req, res) => res.send(req.ip));
 app.use('/api/v1', dashboardRouter);
 app.use('/api/v1/auth', middleware.limiter.accountLimiter, authRouter);
 

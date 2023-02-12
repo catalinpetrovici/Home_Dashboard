@@ -3,18 +3,15 @@ import LineCharts from '../components/LineCharts';
 import { useRef } from 'react';
 import axiosIns from '../utils/axios';
 import { QueryClient } from '@tanstack/react-query';
-import { useQueries } from '@tanstack/react-query';
 import { useLoaderData } from 'react-router-dom';
 
 const fetchDataBarChart = async () => {
   const res = await axiosIns.get('/api/v1/charts');
-  console.log('refetch');
   return res.data;
 };
 
 const fetchDataLineChart = async () => {
   const res = await axiosIns.get('/api/v1/temp');
-  console.log('refetch');
   return res.data;
 };
 

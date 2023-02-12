@@ -1,12 +1,11 @@
 import PieCharts from '../components/PieChart';
 import { useRef } from 'react';
 import axiosIns from '../utils/axios';
-import { QueryClient, useQuery } from '@tanstack/react-query';
-import { redirect, useLoaderData } from 'react-router-dom';
+import { QueryClient } from '@tanstack/react-query';
+import { useLoaderData } from 'react-router-dom';
 
 const fetchData = async () => {
   const res = await axiosIns.get('/api/v1/nowtemp');
-  console.log('refetch');
   return res.data;
 };
 

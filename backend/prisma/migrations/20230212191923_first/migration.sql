@@ -30,7 +30,8 @@ CREATE TABLE "user_preferences" (
 CREATE TABLE "users_auth_log" (
     "log_date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "email" TEXT NOT NULL,
-    "eventType" TEXT NOT NULL,
+    "event_type" TEXT NOT NULL,
+    "user_agent" TEXT NOT NULL,
     "message" TEXT NOT NULL,
 
     CONSTRAINT "users_auth_log_pkey" PRIMARY KEY ("log_date","email")

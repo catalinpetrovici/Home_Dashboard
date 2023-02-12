@@ -7,7 +7,6 @@ import u from '../../utils';
 import db from '../../db/prisma';
 import { Role } from '@prisma/client';
 import crypto from 'crypto';
-import { use } from 'passport';
 
 //
 // ########## login
@@ -49,6 +48,7 @@ export async function login(req: Request, res: Response) {
         email,
         eventType: 'LOGIN',
         message: 'Incorrect Password',
+        userAgent: res.locals.device,
       },
     });
     throw new APIError.Unauthenticated(
@@ -77,6 +77,7 @@ export async function login(req: Request, res: Response) {
       email,
       eventType: 'LOGIN',
       message: 'User logged in',
+      userAgent: res.locals.device,
     },
   });
 
@@ -99,6 +100,10 @@ export async function register(req: Request, res: Response) {
   // Validate the input with zod
   const user = await Register.parseAsync(req.body);
   const { email, password, firstName } = user;
+
+  if (process.env.SIGNUPS_ALLOWED === 'false') {
+    throw new APIError.BadRequestError('Registration is closed');
+  }
 
   // Check email if exist
   const emailCheckExist = await db.user.findUnique({
@@ -156,6 +161,7 @@ const logout = async (req: Request, res: Response) => {
         email,
         eventType: 'LOGOUT',
         message: 'User logged out',
+        userAgent: res.locals.device,
       },
     });
   }
@@ -253,6 +259,7 @@ const forgotPassword = async (req: Request, res: Response) => {
       email,
       eventType: 'FORGOT-PASSWORD',
       message: 'User forgot the password',
+      userAgent: res.locals.device,
     },
   });
 
@@ -320,6 +327,7 @@ const resetPassword = async (req: Request, res: Response) => {
       email,
       eventType: 'RESET-PASSWORD',
       message: 'User has reset the password',
+      userAgent: res.locals.device,
     },
   });
 

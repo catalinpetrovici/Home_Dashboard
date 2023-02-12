@@ -43,7 +43,8 @@ model UserAuthLog {
   logDate   DateTime @default(now()) @map("log_date")
   User      User?    @relation(fields: [email], references: [email])
   email     String
-  eventType String
+  eventType String   @map("event_type")
+  userAgent String   @map("user_agent")
   message   String
 
   @@id([logDate, email])
