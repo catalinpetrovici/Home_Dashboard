@@ -13,29 +13,41 @@ datasource db {
 // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference
 
 model User {
-  id               String          @id @default(uuid())
-  createdAt        DateTime        @default(now()) @map("created_at")
-  updatedAt        DateTime        @updatedAt @map("updated_at")
-  lastName         String          @unique @map("last_name") @db.VarChar(20)
-  firstName        String          @unique @map("first_name") @db.VarChar(20)
-  email            String          @unique
-  phoneNumber      String          @unique @map("phone_number")
-  password         String          @unique
-  role             Role            @default(UNVERIFIED)
-  verificationCode String?         @map("verification_code")
-  userPreference   UserPreference? @relation(fields: [userPreferenceId], references: [id])
-  userPreferenceId String?         @unique @map("user_preference_id")
+  id                String           @id @default(uuid())
+  createdAt         DateTime         @default(now()) @map("created_at")
+  updatedAt         DateTime         @updatedAt @map("updated_at")
+  lastName          String           @unique @map("last_name") @db.VarChar(20)
+  firstName         String           @unique @map("first_name") @db.VarChar(20)
+  email             String           @unique
+  phoneNumber       String           @unique @map("phone_number")
+  password          String           @unique
+  role              Role             @default(UNVERIFIED)
+  verificationCode  String?          @map("verification_code")
+  userPreferences   UserPreferences? @relation(fields: [userPreferencesId], references: [id])
+  userPreferencesId String?          @unique @map("user_preferences_id")
+  UserAuthLog       UserAuthLog[]
 
   @@index([email])
-  @@map("user")
+  @@map("users")
 }
 
-model UserPreference {
+model UserPreferences {
   id       String  @id @default(uuid())
   darkMode Boolean @default(true) @map("dark_mode")
   user     User?
 
-  @@map("user_preference")
+  @@map("user_preferences")
+}
+
+model UserAuthLog {
+  logDate   DateTime @default(now()) @map("log_date")
+  User      User?    @relation(fields: [email], references: [email])
+  email     String
+  eventType String
+  message   String
+
+  @@id([logDate, email])
+  @@map("users_auth_log")
 }
 
 enum Role {

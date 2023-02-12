@@ -6,7 +6,9 @@ import HttpStatusCode from '../interfaces/types/http.model';
 export default function (...roles: Role[]) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!roles.includes(req?.session?.user?.role)) {
-      throw new APIError.Unauthorized('Unauthorized to access this route');
+      res
+        .status(HttpStatusCode.UNAUTHORIZED)
+        .send('Unauthorized to access this route');
     }
     next();
   };

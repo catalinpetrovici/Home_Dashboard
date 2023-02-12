@@ -7,6 +7,7 @@ import u from '../../utils';
 import db from '../../db/prisma';
 import { Role } from '@prisma/client';
 import crypto from 'crypto';
+import { use } from 'passport';
 
 //
 // ########## login
@@ -42,17 +43,25 @@ export async function login(req: Request, res: Response) {
   );
 
   // Throw an error if the user password is not correct
-  if (!passwordIsCorrect)
+  if (!passwordIsCorrect) {
+    await db.userAuthLog.create({
+      data: {
+        email,
+        eventType: 'LOGIN',
+        message: 'Incorrect Password',
+      },
+    });
     throw new APIError.Unauthenticated(
       'These credentials do not match our records!'
     );
+  }
 
   // Throw an error if the user email is not verified
   if (role === Role.UNVERIFIED)
     throw new APIError.Unauthenticated('Email is not verified!');
 
   // Store the session in redis and send the cookie
-  req.session.user = { id, role, firstName };
+  req.session.user = { id, role, firstName, email };
 
   // Set maxAge of session cookie to a day if keepMe is true
   if (keepMe) req.session.cookie.maxAge = 25 * 60 * 60 * 1000;
@@ -62,7 +71,15 @@ export async function login(req: Request, res: Response) {
     `{ "authenticated": true, "role": "${role}" }`
   ).toString('base64');
 
-  console.log('login');
+  // Store a log
+  await db.userAuthLog.create({
+    data: {
+      email,
+      eventType: 'LOGIN',
+      message: 'User logged in',
+    },
+  });
+
   // Response
   res
     .cookie('authenticated', authenticatedCookie, {
@@ -130,15 +147,29 @@ export async function register(req: Request, res: Response) {
 //
 
 const logout = async (req: Request, res: Response) => {
+  const { user } = req.session;
+  // Store a log
+  if (user && user.email) {
+    const { email } = user;
+    await db.userAuthLog.create({
+      data: {
+        email,
+        eventType: 'LOGOUT',
+        message: 'User logged out',
+      },
+    });
+  }
+
   // Delete de session from the redis db
   req.session.destroy((err) => {
     if (err) {
       throw new Error('Could not logout the user');
     }
-
-    // Clear cookie and redirect
-    res.clearCookie('sessionId').redirect('/login');
   });
+
+  // Clear cookie and redirect
+  res.clearCookie('sessionId').clearCookie('authenticated');
+  res.end();
 };
 
 //
@@ -216,6 +247,15 @@ const forgotPassword = async (req: Request, res: Response) => {
   //   origin,
   // });
 
+  // Store a log
+  await db.userAuthLog.create({
+    data: {
+      email,
+      eventType: 'FORGOT-PASSWORD',
+      message: 'User forgot the password',
+    },
+  });
+
   // Update the role and verificationCode of the user
   await db.user.update({
     where: {
@@ -273,6 +313,15 @@ const resetPassword = async (req: Request, res: Response) => {
 
   // Encrypt the password
   const passwordEncrypted = await u.generatePassword(password);
+
+  // Store a log
+  await db.userAuthLog.create({
+    data: {
+      email,
+      eventType: 'RESET-PASSWORD',
+      message: 'User has reset the password',
+    },
+  });
 
   // Update user
   await db.user.update({

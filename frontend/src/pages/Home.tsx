@@ -35,10 +35,10 @@ const COLORS2 = [
 ];
 
 type Data = {
-  tempInside: string;
-  humInside: string;
+  tempInside: number;
+  humInside: number;
   tempOutside: number;
-  humOutside: string;
+  humOutside: number;
 };
 
 const Home = () => {

@@ -1,10 +1,4 @@
-import {
-  useLocation,
-  Navigate,
-  Outlet,
-  Route,
-  redirect,
-} from 'react-router-dom';
+import { useLocation, Navigate, Outlet } from 'react-router-dom';
 import Cookies from 'js-cookie';
 
 type User = {
@@ -19,8 +13,6 @@ const PrivateRoute = ({ children, ...rest }: any) => {
     user = JSON.parse(window.atob(base64String)) as User;
   }
   const location = useLocation();
-
-  console.log('private');
 
   return user?.authenticated ? (
     <Outlet />
