@@ -3,6 +3,7 @@ import { notFound } from './notFound';
 import session from './express-session';
 import authorize from './authorize';
 import authorizeRoles from './authorizeRoles';
+import limiter from './express-rate-limit';
 
 export default {
   errorHandler,
@@ -10,4 +11,5 @@ export default {
   session,
   authorize,
   authorizeRoles,
+  limiter,
 };

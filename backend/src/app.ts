@@ -22,6 +22,9 @@ declare module 'express-session' {
 
 const app = express();
 
+// app.set('trust proxy', 1) // if it matches your public IP address, then the number of proxies is correct and the rate limiter should now work correctly. If not, then keep increasing the number until it does.
+
+app.disable('x-powered-by');
 app.use(morgan('dev'));
 app.use(helmet());
 app.use(cors(corsConfig));
@@ -30,8 +33,9 @@ app.use(middleware.session);
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.get('/ip', (request, response) => response.send(request.ip));
 app.use('/api/v1', dashboardRouter);
-app.use('/api/v1/auth', authRouter);
+app.use('/api/v1/auth', middleware.limiter.accountLimiter, authRouter);
 
 app.use(middleware.notFound);
 app.use(middleware.errorHandler);

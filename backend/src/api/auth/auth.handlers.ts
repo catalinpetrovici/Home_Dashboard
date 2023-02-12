@@ -137,8 +137,7 @@ const logout = async (req: Request, res: Response) => {
     }
 
     // Clear cookie and redirect
-    res.clearCookie('sessionId');
-    res.redirect('/login');
+    res.clearCookie('sessionId').redirect('/login');
   });
 };
 
