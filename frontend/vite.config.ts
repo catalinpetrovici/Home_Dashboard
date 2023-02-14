@@ -8,6 +8,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      registerType: 'autoUpdate',
       manifest: {
         name: 'Dashboard - Home',
         short_name: 'Dashboard',

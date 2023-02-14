@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import APIError from '../errors/api-errors';
-import { Role } from '@prisma/client';
 
 interface UserRequest extends Request {
   user: { role: Role };
