@@ -2,14 +2,14 @@ import HttpStatusCode from '../interfaces/types/http.model';
 
 export class BaseError extends Error {
   public readonly log: string;
-  public readonly methodName: string | undefined;
+  public readonly methodName!: string;
   public readonly httpCode: HttpStatusCode | number;
   public readonly isOperational: boolean;
 
   constructor(
     log: string,
     message: string | unknown = log,
-    methodName?: string,
+    methodName: string,
     httpCode = HttpStatusCode.INTERNAL_SERVER_ERROR,
     isOperational = true
   ) {
@@ -17,7 +17,11 @@ export class BaseError extends Error {
     Object.setPrototypeOf(this, new.target.prototype);
 
     this.log = log;
-    if (methodName) this.methodName = methodName;
+    if (methodName) {
+      this.methodName = methodName;
+    } else {
+      this.methodName = '';
+    }
     this.httpCode = httpCode;
     this.isOperational = isOperational;
 

@@ -26,9 +26,9 @@ export default async function (
       throw new APIError.Unauthorized('Unauthorized to access this route');
     }
 
-    req.user = data;
+    res.locals.user = data;
 
-    next();
+    return next();
   }
   throw new APIError.Unauthorized('Unauthorized to access this route');
 }

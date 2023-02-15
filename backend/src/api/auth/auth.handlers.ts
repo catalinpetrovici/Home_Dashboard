@@ -1,6 +1,6 @@
 // prettier-ignore
 import { Login, Register, VerifyEmail, ForgotPassword, ResetPassword } from './auth.models';
-import { Request, Response } from 'express';
+import e, { Request, Response } from 'express';
 import APIError from '../../errors/api-errors';
 import StatusCodes from '../../interfaces/types/http.model';
 import u from '../../utils';
@@ -23,7 +23,7 @@ export async function login(req: Request, res: Response) {
   // Get password, id and from the database
   const user = await db.user.findUnique({
     where: { email },
-    select: { id: true, password: true, role: true, firstName: true },
+    select: { id: true, password: true, role: true },
   });
 
   // Throw an error if the user doesn't exist
@@ -33,7 +33,7 @@ export async function login(req: Request, res: Response) {
     );
   }
 
-  const { id, firstName, role, password: databasePassword } = user;
+  const { id, role, password: databasePassword } = user;
 
   // Compare passwords
   const passwordIsCorrect = await u.comparePassword(
@@ -61,7 +61,7 @@ export async function login(req: Request, res: Response) {
     throw new APIError.Unauthenticated('Email is not verified!');
 
   // Store the session in redis and send the cookie
-  req.session.user = { id, role, firstName, email };
+  req.session.user = { id };
 
   // Set maxAge of session cookie to a day if keepMe is true
   if (keepMe) req.session.cookie.maxAge = 25 * 60 * 60 * 1000;
@@ -152,10 +152,9 @@ export async function register(req: Request, res: Response) {
 //
 
 const logout = async (req: Request, res: Response) => {
-  const { user } = req.session;
+  const { email } = res.locals.user;
   // Store a log
-  if (user && user.email) {
-    const { email } = user;
+  if (email) {
     await db.userAuthLog.create({
       data: {
         email,

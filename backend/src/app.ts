@@ -16,7 +16,7 @@ import dashboardRouter from './api/dashboard/dashboard.routes';
 
 declare module 'express-session' {
   export interface SessionData {
-    user: { [key: string]: any };
+    user: { id: string };
   }
 }
 
@@ -27,6 +27,7 @@ const app = express();
 app.disable('x-powered-by');
 app.use(morgan('dev'));
 app.use(helmet());
+// app.use(cors());
 app.use(cors(corsConfig));
 app.use(express.json());
 app.use(middleware.session);
