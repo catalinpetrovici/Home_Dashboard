@@ -13,7 +13,7 @@ datasource db {
 // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference
 
 model User {
-  id                String           @id @default(uuid())
+  id                String           @id @default(cuid())
   createdAt         DateTime         @default(now()) @map("created_at")
   updatedAt         DateTime         @updatedAt @map("updated_at")
   lastName          String           @unique @map("last_name") @db.VarChar(20)
@@ -32,7 +32,7 @@ model User {
 }
 
 model UserPreferences {
-  id       String  @id @default(uuid())
+  id       String  @id @default(cuid())
   darkMode Boolean @default(true) @map("dark_mode")
   user     User?
 
