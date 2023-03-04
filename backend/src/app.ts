@@ -8,6 +8,7 @@ import cors from 'cors';
 import passport from 'passport';
 import { corsConfig } from './corsConfig';
 
+import healthcheck from './api/healthcheck/healthcheck.routes';
 import authRouter from './api/auth/auth.routes';
 
 import middleware from './middleware/index';
@@ -34,6 +35,7 @@ app.use(middleware.session);
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use('/', healthcheck);
 app.get('/ip', (req, res) => res.send(req.ip));
 app.use('/api/v1', dashboardRouter);
 app.use('/api/v1/auth', middleware.limiter.accountLimiter, authRouter);

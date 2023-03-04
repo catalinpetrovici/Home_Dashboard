@@ -1,12 +1,13 @@
 // prettier-ignore
 import { Login, Register, VerifyEmail, ForgotPassword, ResetPassword } from './auth.models';
-import e, { Request, Response } from 'express';
+import { Request, Response } from 'express';
 import APIError from '../../errors/api-errors';
 import StatusCodes from '../../interfaces/types/http.model';
 import u from '../../utils';
 import db from '../../db/prisma';
 import { Role } from '@prisma/client';
 import crypto from 'crypto';
+import Logger from '../../log/pino';
 
 //
 // ########## login
@@ -28,6 +29,7 @@ export async function login(req: Request, res: Response) {
 
   // Throw an error if the user doesn't exist
   if (!user) {
+    Logger.info({ HTTP: 'login', email }, `❌ User doesn't exist!`);
     throw new APIError.BadRequestError(
       'These credentials do not match our records!'
     );
@@ -51,6 +53,7 @@ export async function login(req: Request, res: Response) {
         userAgent: res.locals.device,
       },
     });
+    Logger.info({ HTTP: 'login', email }, `❌ User password is not correct!`);
     throw new APIError.Unauthenticated(
       'These credentials do not match our records!'
     );
@@ -81,6 +84,8 @@ export async function login(req: Request, res: Response) {
     },
   });
 
+  Logger.info({ HTTP: 'login', email }, `✅ User logged in!`);
+
   // Response
   res
     .cookie('authenticated', authenticatedCookie, {
@@ -102,6 +107,10 @@ export async function register(req: Request, res: Response) {
   const { email, password, firstName } = user;
 
   if (process.env.SIGNUPS_ALLOWED === 'false') {
+    Logger.info(
+      { HTTP: 'register', email },
+      `🚫 Registration is currently disabled!`
+    );
     throw new APIError.BadRequestError('Registration is closed');
   }
 
@@ -113,6 +122,7 @@ export async function register(req: Request, res: Response) {
 
   // Throw an error if email exits
   if (emailCheckExist) {
+    Logger.info({ HTTP: 'register', email }, `❌ Email exits!`);
     throw new APIError.BadRequestError('Email already exists');
   }
 
@@ -141,6 +151,8 @@ export async function register(req: Request, res: Response) {
     },
   });
 
+  Logger.info({ HTTP: 'register', email }, `✅ User registered!`);
+
   // Response
   res.status(StatusCodes.CREATED).json({
     message: 'Success! Please check your email to verify',
@@ -153,17 +165,6 @@ export async function register(req: Request, res: Response) {
 
 const logout = async (req: Request, res: Response) => {
   const { email } = res.locals.user;
-  // Store a log
-  if (email) {
-    await db.userAuthLog.create({
-      data: {
-        email,
-        eventType: 'LOGOUT',
-        message: 'User logged out',
-        userAgent: res.locals.device,
-      },
-    });
-  }
 
   // Delete de session from the redis db
   req.session.destroy((err) => {
@@ -171,6 +172,8 @@ const logout = async (req: Request, res: Response) => {
       throw new Error('Could not logout the user');
     }
   });
+
+  Logger.info({ HTTP: 'logout', email }, `✅ User logged out!`);
 
   // Clear cookie and redirect
   res.clearCookie('sessionId').clearCookie('authenticated');
@@ -193,6 +196,7 @@ const verifyEmail = async (req: Request, res: Response) => {
 
   // Throw an error if the user doesn't exist
   if (!user) {
+    Logger.info({ HTTP: 'verifyEmail', email }, `❌ User doesn't exist!`);
     throw new APIError.BadRequestError('Verification Failed!');
   }
 
@@ -213,6 +217,8 @@ const verifyEmail = async (req: Request, res: Response) => {
     },
   });
 
+  Logger.info({ HTTP: 'verifyEmail', email }, `✅ Email Verified!`);
+
   // Response
   res.status(StatusCodes.OK).json({ msg: 'Email Verified!' });
 };
@@ -232,7 +238,10 @@ const forgotPassword = async (req: Request, res: Response) => {
   });
 
   // Throw error if the user doesn't exist
-  if (!user) throw new APIError.BadRequestError('Please provide valid email');
+  if (!user) {
+    Logger.info({ HTTP: 'forgotPassword', email }, `❌ User doesn't exist!`);
+    throw new APIError.BadRequestError('Please provide valid email');
+  }
 
   const { id, firstName } = user;
 
@@ -274,6 +283,11 @@ const forgotPassword = async (req: Request, res: Response) => {
     },
   });
 
+  Logger.info(
+    { HTTP: 'forgotPassword', email },
+    `✅ Please check your email for reset password link!`
+  );
+
   // Response
   res
     .status(StatusCodes.OK)
@@ -297,7 +311,10 @@ const resetPassword = async (req: Request, res: Response) => {
   });
 
   // Throw error if the user doesn't exist
-  if (!user) throw new APIError.BadRequestError('Please provide valid email');
+  if (!user) {
+    Logger.info({ HTTP: 'resetPassword', email }, `❌ User doesn't exist!`);
+    throw new APIError.BadRequestError('Please provide valid email');
+  }
 
   // Get the verification_code and updated_at parameters of the user
   const { verificationCode, updatedAt: tokenExpirationDate } = user;
@@ -309,13 +326,20 @@ const resetPassword = async (req: Request, res: Response) => {
     );
 
   // Throw error if token is invalid
-  if (verificationToken !== verificationCode)
+  if (verificationToken !== verificationCode) {
+    Logger.info({ HTTP: 'resetPassword', email }, `❌ Token is invalid!`);
     throw new APIError.BadRequestError('Verification Token is invalid');
+  }
 
   // Compare expiration date for token and verification code
   const currentDate = new Date();
-  if (tokenExpirationDate.getTime() < currentDate.getTime())
+  if (tokenExpirationDate.getTime() < currentDate.getTime()) {
+    Logger.info(
+      { HTTP: 'resetPassword', email },
+      `❌ Verification Token is expired!`
+    );
     throw new APIError.BadRequestError('Verification Token is expired!');
+  }
 
   // Encrypt the password
   const passwordEncrypted = await u.generatePassword(password);
@@ -341,6 +365,8 @@ const resetPassword = async (req: Request, res: Response) => {
       password: passwordEncrypted,
     },
   });
+
+  Logger.info({ HTTP: 'resetPassword', email }, `✅ Password has been reset!`);
 
   // Response
   res.status(StatusCodes.NO_CONTENT);

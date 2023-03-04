@@ -17,9 +17,9 @@ const streams = [
   },
 ];
 
-export const logger = pino(
+export default pino(
   {
-    level: 'debug',
+    level: 'info',
     timestamp: () => `,"time":"${new Date(Date.now()).toLocaleString('ro')}"`,
     formatters: {
       bindings: (bindings) => {
@@ -32,14 +32,3 @@ export const logger = pino(
   },
   pino.multistream(streams)
 );
-
-//     // customLevels: {
-//     //   fatal: 24,
-//     //   error: 20,
-//     //   warn: 16,
-//     //   info: 12,
-//     //   http: 10,
-//     //   debug: 8,
-//     //   trace: 4,
-//     // },
-//     // useOnlyCustomLevels: true,

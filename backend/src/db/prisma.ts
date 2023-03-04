@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client';
-import { logger } from '../log/pino';
+import Logger from '../log/pino';
 
 const db = new PrismaClient({
   log: ['query', 'info', 'warn', 'error'],
@@ -8,13 +8,9 @@ const db = new PrismaClient({
 async function connectToDatabase() {
   try {
     await db.$connect();
-    logger.info('✅✅✅ PostgreSQL: Connected successfully!');
-    // console.log('✅✅✅ PostgreSQL: Connected successfully!💃');
+    Logger.info('✅✅✅ PostgreSQL: Connected successfully!');
   } catch (error) {
-    logger.error({ error }, `❌❌❌ PostgreSQL: Connected successfully! 💩`);
-    // console.error(
-    //   `\n❌❌❌ PostgreSQL: Failed to connect to database!💩 ${error}`
-    // );
+    Logger.error({ error }, `❌❌❌ PostgreSQL: Connected successfully! 💩`);
     process.exit(1);
   }
 }
