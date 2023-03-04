@@ -1,21 +1,6 @@
-import pino, { DestinationStream } from 'pino';
-import pretty from 'pino-pretty';
-
-const date = new Date();
-const formatDate = `${date.getMonth() + 1}-${date.getDate()}`;
-
-const streams = [
-  {
-    stream: pretty({
-      destination: process.stdout,
-      translateTime: 'SYS:dd-mm-yyyy HH:MM:ss',
-      ignore: 'pid,hostname',
-    }),
-  },
-  {
-    stream: pino.destination({ dest: `${__dirname}/${formatDate}.log` }),
-  },
-];
+require('dotenv').config();
+import pino from 'pino';
+import { streams } from './config';
 
 export default pino(
   {
@@ -30,5 +15,5 @@ export default pino(
       },
     },
   },
-  pino.multistream(streams)
+  pino.multistream(streams())
 );

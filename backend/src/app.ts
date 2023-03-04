@@ -8,6 +8,8 @@ import cors from 'cors';
 import passport from 'passport';
 import { corsConfig } from './corsConfig';
 
+import { mqttClient } from './service/mqtt';
+
 import healthcheck from './api/healthcheck/healthcheck.routes';
 import authRouter from './api/auth/auth.routes';
 
@@ -28,19 +30,21 @@ const app = express();
 app.disable('x-powered-by');
 app.use(morgan('dev'));
 app.use(helmet());
-app.use(cors());
-// app.use(cors(corsConfig));
+// app.use(cors());
+app.use(cors(corsConfig));
 app.use(express.json());
 app.use(middleware.session);
 app.use(passport.initialize());
 app.use(passport.session());
 
-app.use('/', healthcheck);
-app.get('/ip', (req, res) => res.send(req.ip));
-app.use('/api/v1', dashboardRouter);
+app.use('/', middleware.limiter.apiLimiter, healthcheck);
+app.get('/api/v1/ip', (req, res) => res.status(200).send(req.ip));
+app.use('/api/v1/dash', middleware.limiter.apiLimiter, dashboardRouter);
 app.use('/api/v1/auth', middleware.limiter.accountLimiter, authRouter);
 
 app.use(middleware.notFound);
 app.use(middleware.errorHandler);
+
+mqttClient.on('connect', () => {});
 
 export default app;

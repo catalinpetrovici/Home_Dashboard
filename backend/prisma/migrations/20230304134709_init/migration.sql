@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "DeviceType" AS ENUM ('UNSPECIFIED', 'SENSOR', 'SWITCH', 'SLIDER', 'DISPLAY');
+
+-- CreateEnum
 CREATE TYPE "Role" AS ENUM ('BASIC', 'ADMIN', 'UNVERIFIED', 'LOST');
 
 -- CreateTable
@@ -35,6 +38,19 @@ CREATE TABLE "users_auth_log" (
     "message" TEXT NOT NULL,
 
     CONSTRAINT "users_auth_log_pkey" PRIMARY KEY ("log_date","email")
+);
+
+-- CreateTable
+CREATE TABLE "Device" (
+    "id" TEXT NOT NULL,
+    "device_id" TEXT NOT NULL,
+    "device_type" "DeviceType" NOT NULL DEFAULT 'UNSPECIFIED',
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+    "topic" TEXT NOT NULL,
+    "data" JSONB NOT NULL,
+
+    CONSTRAINT "Device_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateIndex

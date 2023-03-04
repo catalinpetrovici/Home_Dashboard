@@ -8,10 +8,15 @@ const Roles = authorizeRoles(Role.BASIC);
 
 const router = express.Router();
 
-router.get<{}, {}>('/', deserialize, Dashboard.getData);
-router.get<{}, {}>('/charts', deserialize, Dashboard.getCharts);
-router.get<{}, {}>('/nowtemp', deserialize, Dashboard.getNowTempHum);
-router.get<{}, {}>('/temp', deserialize, Dashboard.getTempHum);
-router.post<{}, {}>('/led', deserialize, Dashboard.ledControl);
+router.get<{}, {}>('/devices', deserialize, Dashboard.getData);
+router.get<{}, {}>('/devices/data/:deviceId');
+router.post<{}, {}>(
+  '/devices/control/:deviceId',
+  deserialize,
+  Dashboard.ledControl
+);
+
+router.get<{}, {}>('/charts/:type', deserialize, Dashboard.getCharts);
+router.get<{}, {}>('/now/:type', deserialize, Dashboard.getNowTempHum);
 
 export default router;

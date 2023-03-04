@@ -51,6 +51,24 @@ model UserAuthLog {
   @@map("users_auth_log")
 }
 
+model Device {
+  id         String     @id @default(cuid())
+  deviceId   String     @map("device_id")
+  deviceType DeviceType @default(UNSPECIFIED) @map("device_type")
+  createdAt  DateTime   @default(now()) @map("created_at")
+  updatedAt  DateTime   @updatedAt @map("updated_at")
+  topic      String
+  data       Json
+}
+
+enum DeviceType {
+  UNSPECIFIED
+  SENSOR
+  SWITCH
+  SLIDER
+  DISPLAY
+}
+
 enum Role {
   BASIC
   ADMIN

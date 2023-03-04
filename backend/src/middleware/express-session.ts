@@ -1,6 +1,6 @@
 import session from 'express-session';
 import connectRedis from 'connect-redis';
-import { redisClient } from '../db/redis';
+import { redisClientLegacy } from '../db/redis';
 
 const RedisStore = connectRedis(session);
 
@@ -10,7 +10,7 @@ export default session({
   saveUninitialized: false,
   resave: false,
   store: new RedisStore({
-    client: redisClient,
+    client: redisClientLegacy,
     disableTouch: true,
   }),
   cookie: {
