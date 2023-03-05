@@ -17,7 +17,7 @@ export function streams() {
     },
   ];
 
-  if (process.env.NODE_ENV !== 'development') return streamsDev;
+  if (process.env.NODE_ENV === 'development') return streamsDev;
 
   const streamsProd = [
     {

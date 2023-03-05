@@ -9,8 +9,8 @@ export const config: IClientOptions = {
   reconnectPeriod: 1000,
   keepalive: 60,
   will: {
-    topic: `${process.env.CLIENT_ID}/status`,
-    payload: 'offline',
+    topic: `server/${process.env.CLIENT_ID}/online`,
+    payload: 'false',
     qos: 1,
     retain: true,
   },

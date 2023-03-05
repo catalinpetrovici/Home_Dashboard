@@ -52,13 +52,30 @@ model UserAuthLog {
 }
 
 model Device {
-  id         String     @id @default(cuid())
-  deviceId   String     @map("device_id")
-  deviceType DeviceType @default(UNSPECIFIED) @map("device_type")
-  createdAt  DateTime   @default(now()) @map("created_at")
-  updatedAt  DateTime   @updatedAt @map("updated_at")
-  topic      String
-  data       Json
+  deviceFamily String       @map("device_family")
+  deviceName   String       @map("device_name")
+  defaultName  String       @map("default_name")
+  topic        String       @unique
+  type         DeviceType   @default(UNSPECIFIED)
+  status       Status       @default(UNKNOWN)
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+  data         String
+  DeviceData   DeviceData[]
+
+  @@id([topic])
+  @@map("device")
+}
+
+model DeviceData {
+  Device    Device?  @relation(fields: [topic], references: [topic])
+  topic     String
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+  data      String
+
+  @@id([topic, createdAt])
+  @@map("device_data")
 }
 
 enum DeviceType {
@@ -74,4 +91,10 @@ enum Role {
   ADMIN
   UNVERIFIED
   LOST
+}
+
+enum Status {
+  UNKNOWN
+  ONLINE
+  OFFLINE
 }

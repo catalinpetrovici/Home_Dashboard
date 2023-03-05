@@ -7,6 +7,7 @@
     "make-seed": "npx knex seed:make dev --knexfile ./src/db/knex-config.ts",
     "seed": "npx knex seed:run --knexfile ./src/db/knex-config.ts",
     "migrate": "npx knex migrate:latest --knexfile ./src/db/knex-config.ts",
+    "prisma-migrate-dev": "npx prisma migrate dev --name init",
     "start": "ts-node src/index.ts",
     "dev": "nodemon src/index.ts",
     "build": "tsc",
