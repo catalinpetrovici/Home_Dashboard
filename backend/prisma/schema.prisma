@@ -13,77 +13,102 @@ datasource db {
 // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference
 
 model User {
-  id                String           @id @default(cuid())
-  createdAt         DateTime         @default(now()) @map("created_at")
-  updatedAt         DateTime         @updatedAt @map("updated_at")
-  lastName          String           @unique @map("last_name") @db.VarChar(20)
-  firstName         String           @unique @map("first_name") @db.VarChar(20)
-  email             String           @unique
-  phoneNumber       String           @unique @map("phone_number")
-  password          String           @unique
-  role              Role             @default(UNVERIFIED)
-  verificationCode  String?          @map("verification_code")
-  userPreferences   UserPreferences? @relation(fields: [userPreferencesId], references: [id])
-  userPreferencesId String?          @unique @map("user_preferences_id")
-  UserAuthLog       UserAuthLog[]
+  id               String           @id @unique @default(cuid())
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
+  lastName         String           @unique @map("last_name") @db.VarChar(20)
+  firstName        String           @unique @map("first_name") @db.VarChar(20)
+  email            String           @unique
+  phoneNumber      String           @unique @map("phone_number")
+  role             Role             @default(UNVERIFIED)
+  verificationCode String?          @map("verification_code")
+  password         String           @unique
+  userPreferences  UserPreferences?
+  UserAuthLog      UserAuthLog[]
+  Session          UserSession[]
 
   @@index([email])
   @@map("users")
 }
 
+model UserSession {
+  userId       String   @map("user_id")
+  sessionToken String   @unique @map("session_token") @db.Text
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_session")
+}
+
 model UserPreferences {
-  id       String  @id @default(cuid())
+  userId   String  @unique @map("user_id")
   darkMode Boolean @default(true) @map("dark_mode")
-  user     User?
+  user     User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("user_preferences")
 }
 
 model UserAuthLog {
+  userId    String   @map("user_id")
   logDate   DateTime @default(now()) @map("log_date")
-  User      User?    @relation(fields: [email], references: [email])
-  email     String
   eventType String   @map("event_type")
   userAgent String   @map("user_agent")
-  message   String
+  message   String?  @db.Text
+  User      User     @relation(fields: [userId], references: [id])
 
-  @@id([logDate, email])
+  @@id([userId, logDate])
   @@map("users_auth_log")
 }
 
 model Device {
-  deviceFamily String       @map("device_family")
-  deviceName   String       @map("device_name")
-  defaultName  String       @map("default_name")
-  topic        String       @unique
-  type         DeviceType   @default(UNSPECIFIED)
-  status       Status       @default(UNKNOWN)
-  createdAt    DateTime     @default(now()) @map("created_at")
-  updatedAt    DateTime     @updatedAt @map("updated_at")
-  data         String
-  DeviceData   DeviceData[]
+  deviceName     String        @map("device_name")
+  defaultName    String?       @map("default_name")
+  deviceFamily   String        @map("device_family")
+  topic          String        @unique
+  type           DeviceType    @default(UNSPECIFIED)
+  isDataRecorded Boolean?      @default(false) @map("is_data_recorded")
+  columnDasboard Int?          @map("column_dasboard")
+  lineDasboard   Int?          @map("line_dasboard")
+  data           String
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  topicRecord    TopicRecord[]
+  // DeviceStatus   DeviceStatus  @relation(fields: [deviceName], references: [deviceName])
 
   @@id([topic])
   @@map("device")
 }
 
-model DeviceData {
-  Device    Device?  @relation(fields: [topic], references: [topic])
+model DeviceStatus {
+  deviceName String @unique @map("device_name")
+  status     Status @default(UNKNOWN)
+  // device     Device[]
+
+  @@map("device_status")
+}
+
+model TopicRecord {
   topic     String
   createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
   data      String
+  Device    Device?  @relation(fields: [topic], references: [topic])
 
   @@id([topic, createdAt])
-  @@map("device_data")
+  @@map("topic_record")
 }
 
 enum DeviceType {
   UNSPECIFIED
-  SENSOR
+  STATUS
+  HUMIDITY
+  TEMPERATURE
+  ELECTRICPOWER
+  MOTIONSENSOR
+  LEDSTRIP
   SWITCH
   SLIDER
   DISPLAY
+  TEXT
 }
 
 enum Role {
@@ -91,6 +116,7 @@ enum Role {
   ADMIN
   UNVERIFIED
   LOST
+  BLOCKED
 }
 
 enum Status {

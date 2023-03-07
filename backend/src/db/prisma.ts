@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client';
 import Logger from '../log/pino';
 
 const db = new PrismaClient({
-  log: ['query', 'info', 'warn', 'error'],
+  // log: ['query', 'info', 'warn', 'error'],
 });
 
 async function connectToDatabase() {

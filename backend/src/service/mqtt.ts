@@ -55,9 +55,10 @@ mqttClient.on('message', async (clientAndTopic, message) => {
   if (topic.endsWith('online') || topic.endsWith('status')) {
     const status =
       message.toString() === 'true' ? Status.ONLINE : Status.OFFLINE;
-    await db.device.updateMany({
+    await db.deviceStatus.upsert({
       where: { deviceName: client },
-      data: { status },
+      update: { status: status },
+      create: { deviceName: client, status: status },
     });
   }
 

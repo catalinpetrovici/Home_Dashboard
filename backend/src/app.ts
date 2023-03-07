@@ -10,12 +10,12 @@ import { corsConfig } from './corsConfig';
 
 import { mqttClient } from './service/mqtt';
 
-import healthcheck from './api/healthcheck/healthcheck.routes';
-import authRouter from './api/auth/auth.routes';
-
 import middleware from './middleware/index';
 
+import healthcheck from './api/healthcheck/healthcheck.routes';
+import authRouter from './api/auth/auth.routes';
 import dashboardRouter from './api/dashboard/dashboard.routes';
+import devicesRouter from './api/device/device.routes';
 
 declare module 'express-session' {
   export interface SessionData {
@@ -39,8 +39,11 @@ app.use(passport.session());
 
 app.use('/', middleware.limiter.apiLimiter, healthcheck);
 app.get('/api/v1/ip', (req, res) => res.status(200).send(req.ip));
-app.use('/api/v1/dash', middleware.limiter.apiLimiter, dashboardRouter);
+
 app.use('/api/v1/auth', middleware.limiter.accountLimiter, authRouter);
+
+app.use('/api/v1/dash', middleware.limiter.apiLimiter, dashboardRouter);
+app.use('/api/v1/devices', middleware.limiter.accountLimiter, devicesRouter);
 
 app.use(middleware.notFound);
 app.use(middleware.errorHandler);

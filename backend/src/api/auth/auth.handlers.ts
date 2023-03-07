@@ -47,7 +47,7 @@ export async function login(req: Request, res: Response) {
   if (!passwordIsCorrect) {
     await db.userAuthLog.create({
       data: {
-        email,
+        userId: id,
         eventType: 'LOGIN',
         message: 'Incorrect Password',
         userAgent: res.locals.device,
@@ -77,7 +77,7 @@ export async function login(req: Request, res: Response) {
   // Store a log
   await db.userAuthLog.create({
     data: {
-      email,
+      userId: id,
       eventType: 'LOGIN',
       message: 'User logged in',
       userAgent: res.locals.device,
@@ -264,7 +264,7 @@ const forgotPassword = async (req: Request, res: Response) => {
   // Store a log
   await db.userAuthLog.create({
     data: {
-      email,
+      userId: id,
       eventType: 'FORGOT-PASSWORD',
       message: 'User forgot the password',
       userAgent: res.locals.device,
@@ -307,7 +307,7 @@ const resetPassword = async (req: Request, res: Response) => {
   // Get the ID and firstName parameters of the user
   const user = await db.user.findUnique({
     where: { email },
-    select: { verificationCode: true, updatedAt: true },
+    select: { id: true, verificationCode: true, updatedAt: true },
   });
 
   // Throw error if the user doesn't exist
@@ -317,7 +317,7 @@ const resetPassword = async (req: Request, res: Response) => {
   }
 
   // Get the verification_code and updated_at parameters of the user
-  const { verificationCode, updatedAt: tokenExpirationDate } = user;
+  const { id, verificationCode, updatedAt: tokenExpirationDate } = user;
 
   // Throw error if token is invalid
   if (!tokenExpirationDate)
@@ -347,7 +347,7 @@ const resetPassword = async (req: Request, res: Response) => {
   // Store a log
   await db.userAuthLog.create({
     data: {
-      email,
+      userId: id,
       eventType: 'RESET-PASSWORD',
       message: 'User has reset the password',
       userAgent: res.locals.device,
