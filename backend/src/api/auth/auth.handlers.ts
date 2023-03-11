@@ -369,7 +369,7 @@ const resetPassword = async (req: Request, res: Response) => {
   Logger.info({ HTTP: 'resetPassword', email }, `✅ Password has been reset!`);
 
   // Response
-  res.status(StatusCodes.NO_CONTENT);
+  res.status(StatusCodes.OK);
 };
 
 export default {

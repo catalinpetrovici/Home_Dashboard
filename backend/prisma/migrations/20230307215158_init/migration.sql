@@ -16,9 +16,9 @@ CREATE TABLE "users" (
     "first_name" VARCHAR(20) NOT NULL,
     "email" TEXT NOT NULL,
     "phone_number" TEXT NOT NULL,
-    "password" TEXT NOT NULL,
     "role" "Role" NOT NULL DEFAULT 'UNVERIFIED',
     "verification_code" TEXT,
+    "password" TEXT NOT NULL,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -83,12 +83,6 @@ CREATE TABLE "topic_record" (
 CREATE UNIQUE INDEX "users_id_key" ON "users"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "users_last_name_key" ON "users"("last_name");
-
--- CreateIndex
-CREATE UNIQUE INDEX "users_first_name_key" ON "users"("first_name");
-
--- CreateIndex
 CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
 
 -- CreateIndex
@@ -119,7 +113,7 @@ ALTER TABLE "user_session" ADD CONSTRAINT "user_session_user_id_fkey" FOREIGN KE
 ALTER TABLE "user_preferences" ADD CONSTRAINT "user_preferences_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "users_auth_log" ADD CONSTRAINT "users_auth_log_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "users_auth_log" ADD CONSTRAINT "users_auth_log_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "topic_record" ADD CONSTRAINT "topic_record_topic_fkey" FOREIGN KEY ("topic") REFERENCES "device"("topic") ON DELETE RESTRICT ON UPDATE CASCADE;

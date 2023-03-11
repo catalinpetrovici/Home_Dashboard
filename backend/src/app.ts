@@ -30,8 +30,8 @@ const app = express();
 app.disable('x-powered-by');
 app.use(morgan('dev'));
 app.use(helmet());
-// app.use(cors());
-app.use(cors(corsConfig));
+app.use(cors({ credentials: true }));
+// app.use(cors(corsConfig));
 app.use(express.json());
 app.use(middleware.session);
 app.use(passport.initialize());
@@ -48,6 +48,6 @@ app.use('/api/v1/devices', middleware.limiter.accountLimiter, devicesRouter);
 app.use(middleware.notFound);
 app.use(middleware.errorHandler);
 
-mqttClient.on('connect', () => {});
+// mqttClient.on('connect', () => {});
 
 export default app;
