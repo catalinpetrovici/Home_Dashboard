@@ -30,6 +30,11 @@
 - [ ] Health Checks and Graceful Shutdown - (express)[https://expressjs.com/en/advanced/healthcheck-graceful-shutdown.html]
 
 
+### Migrate to Next.js
+
+- code splitting by default
+- image optimization "<Image>"
+
 #### ENV
 
 express.env: 

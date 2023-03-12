@@ -18,6 +18,6 @@ export default session({
     httpOnly: true,
     // domain: '',
     sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-    maxAge: 1000 * 60 * 2, // session max age in milliseconds
+    maxAge: 1000 * 60 * 60, // session max age in milliseconds
   },
 });

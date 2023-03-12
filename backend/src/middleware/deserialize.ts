@@ -42,13 +42,19 @@ export default async function (
       `✅ Authorized by deserialize!`
     );
 
-    await db.userSession.create({
-      data: {
-        userId: id,
-        sessionToken: req.sessionID,
-        expires: req.session.cookie.expires,
-      },
-    });
+    try {
+      await db.userSession.create({
+        data: {
+          userId: id,
+          sessionToken: req.sessionID,
+          expires: req.session.cookie.expires,
+        },
+      });
+    } catch (error: any) {
+      if (error.code !== 'P2002') {
+        console.log('deserialize', error);
+      }
+    }
 
     res.locals.user = data;
 

@@ -61,40 +61,54 @@ model UserAuthLog {
 }
 
 model Device {
-  deviceName     String        @map("device_name")
-  defaultName    String?       @map("default_name")
-  deviceFamily   String        @map("device_family")
-  topic          String        @unique
-  type           DeviceType    @default(UNSPECIFIED)
-  isDataRecorded Boolean?      @default(false) @map("is_data_recorded")
-  columnDasboard Int?          @map("column_dasboard")
-  lineDasboard   Int?          @map("line_dasboard")
-  data           String
-  createdAt      DateTime      @default(now()) @map("created_at")
-  updatedAt      DateTime      @updatedAt @map("updated_at")
-  topicRecord    TopicRecord[]
-  // DeviceStatus   DeviceStatus  @relation(fields: [deviceName], references: [deviceName])
+  id           String        @id @unique @default(cuid())
+  deviceName   String        @unique @map("device_name")
+  deviceFamily String        @map("device_family")
+  status       Status        @default(UNKNOWN)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  updatedAt    DateTime      @updatedAt @map("updated_at")
+  topic        TopicDevice[]
 
-  @@id([topic])
   @@map("device")
 }
 
-model DeviceStatus {
-  deviceName String @unique @map("device_name")
-  status     Status @default(UNKNOWN)
-  // device     Device[]
+model TopicDevice {
+  id              String        @id @unique @default(cuid())
+  deviceId        String?       @map("device_id")
+  topic           String        @unique
+  qos             Int
+  topicName       String?       @map("topic_name")
+  type            DeviceType    @default(UNSPECIFIED)
+  isDataRecorded  Boolean?      @default(false) @map("is_data_recorded")
+  columnDashboard Int?          @map("column_dashboard")
+  lineDashboard   Int?          @map("line_dashboard")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  Device          Device?       @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  topicRecord     TopicRecord[]
 
-  @@map("device_status")
+  @@map("topic_device")
 }
 
 model TopicRecord {
-  topic     String
+  topicId   String       @map("topic_id")
+  createdAt DateTime     @default(now()) @map("created_at")
+  data      String
+  topic     TopicDevice? @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@id([topicId, createdAt])
+  @@map("topic_record")
+}
+
+model TopicRecordChart {
+  topicId   String   @map("topic_id")
   createdAt DateTime @default(now()) @map("created_at")
   data      String
-  Device    Device?  @relation(fields: [topic], references: [topic])
+  0         String
+  1         String
 
-  @@id([topic, createdAt])
-  @@map("topic_record")
+  @@id([topicId, createdAt])
+  @@map("topic_record_chart")
 }
 
 enum DeviceType {

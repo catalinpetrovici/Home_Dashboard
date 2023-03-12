@@ -1,35 +1,58 @@
 import { Request, Response } from 'express';
+import db from '../../db/prisma';
+import APIError from '../../errors/api-errors';
+import StatusCodes from '../../interfaces/types/http.model';
+import { AddDevice, UpdateDevice, RemoveDevice } from './device.models';
 
 async function getAll(req: Request, res: Response): Promise<void> {
-  // TODO VALIDATE THE BODY
+  const data = await db.device.findMany();
 
-  // TODO ERROR HANDLING
-
-  res.json();
+  res.status(StatusCodes.OK).json({ length: data.length, data });
 }
 
 async function add(req: Request, res: Response): Promise<void> {
-  // TODO VALIDATE THE BODY
+  // Validate the input with zod
+  const { deviceName, deviceFamily } = await AddDevice.parseAsync(req.body);
 
-  // TODO ERROR HANDLING
+  const device = await db.device.create({
+    data: {
+      deviceName,
+      deviceFamily,
+    },
+  });
 
-  res.json();
-}
-
-async function remove(req: Request, res: Response): Promise<void> {
-  // TODO VALIDATE THE BODY
-
-  // TODO ERROR HANDLING
-
-  res.json();
+  res.status(StatusCodes.CREATED).json({ ...device });
 }
 
 async function update(req: Request, res: Response): Promise<void> {
-  // TODO VALIDATE THE BODY
+  // Validate the input with zod
+  const { id } = req.params;
 
-  // TODO ERROR HANDLING
+  const { deviceName, deviceFamily } = await UpdateDevice.parseAsync(req.body);
 
-  res.json();
+  const device = await db.device.update({
+    where: {
+      id,
+    },
+    data: {
+      deviceName,
+      deviceFamily,
+    },
+  });
+
+  res.status(StatusCodes.OK).json({ ...device });
+}
+
+async function remove(req: Request, res: Response): Promise<void> {
+  const { id } = await RemoveDevice.parseAsync(req.params);
+
+  const device = await db.device.delete({
+    where: {
+      id,
+    },
+  });
+
+  res.status(StatusCodes.OK).json({ ...device });
 }
 
 export default { getAll, update, add, remove };

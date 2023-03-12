@@ -1,3 +1,6 @@
+import db from '../db/prisma';
+import { TopicDevice } from '@prisma/client';
+
 export const topicsQos0 = [
   'microcontroller/esp8266-01/dht22/temperature',
   'microcontroller/esp8266-01/dht22/humidity',

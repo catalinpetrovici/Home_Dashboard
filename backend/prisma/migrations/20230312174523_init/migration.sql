@@ -49,34 +49,40 @@ CREATE TABLE "users_auth_log" (
 
 -- CreateTable
 CREATE TABLE "device" (
+    "id" TEXT NOT NULL,
     "device_name" TEXT NOT NULL,
-    "default_name" TEXT,
     "device_family" TEXT NOT NULL,
-    "topic" TEXT NOT NULL,
-    "type" "DeviceType" NOT NULL DEFAULT 'UNSPECIFIED',
-    "is_data_recorded" BOOLEAN DEFAULT false,
-    "column_dasboard" INTEGER,
-    "line_dasboard" INTEGER,
-    "data" TEXT NOT NULL,
+    "status" "Status" NOT NULL DEFAULT 'UNKNOWN',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updated_at" TIMESTAMP(3) NOT NULL,
 
-    CONSTRAINT "device_pkey" PRIMARY KEY ("topic")
+    CONSTRAINT "device_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
-CREATE TABLE "device_status" (
-    "device_name" TEXT NOT NULL,
-    "status" "Status" NOT NULL DEFAULT 'UNKNOWN'
+CREATE TABLE "topic_device" (
+    "id" TEXT NOT NULL,
+    "device_id" TEXT,
+    "topic" TEXT NOT NULL,
+    "qos" INTEGER NOT NULL,
+    "topic_name" TEXT,
+    "type" "DeviceType" NOT NULL DEFAULT 'UNSPECIFIED',
+    "is_data_recorded" BOOLEAN DEFAULT false,
+    "column_dashboard" INTEGER,
+    "line_dashboard" INTEGER,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updated_at" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "topic_device_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
 CREATE TABLE "topic_record" (
-    "topic" TEXT NOT NULL,
+    "topic_id" TEXT NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "data" TEXT NOT NULL,
 
-    CONSTRAINT "topic_record_pkey" PRIMARY KEY ("topic","created_at")
+    CONSTRAINT "topic_record_pkey" PRIMARY KEY ("topic_id","created_at")
 );
 
 -- CreateIndex
@@ -101,10 +107,16 @@ CREATE UNIQUE INDEX "user_session_session_token_key" ON "user_session"("session_
 CREATE UNIQUE INDEX "user_preferences_user_id_key" ON "user_preferences"("user_id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "device_topic_key" ON "device"("topic");
+CREATE UNIQUE INDEX "device_id_key" ON "device"("id");
 
 -- CreateIndex
-CREATE UNIQUE INDEX "device_status_device_name_key" ON "device_status"("device_name");
+CREATE UNIQUE INDEX "device_device_name_key" ON "device"("device_name");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "topic_device_id_key" ON "topic_device"("id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "topic_device_topic_key" ON "topic_device"("topic");
 
 -- AddForeignKey
 ALTER TABLE "user_session" ADD CONSTRAINT "user_session_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
@@ -116,4 +128,7 @@ ALTER TABLE "user_preferences" ADD CONSTRAINT "user_preferences_user_id_fkey" FO
 ALTER TABLE "users_auth_log" ADD CONSTRAINT "users_auth_log_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "topic_record" ADD CONSTRAINT "topic_record_topic_fkey" FOREIGN KEY ("topic") REFERENCES "device"("topic") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "topic_device" ADD CONSTRAINT "topic_device_device_id_fkey" FOREIGN KEY ("device_id") REFERENCES "device"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "topic_record" ADD CONSTRAINT "topic_record_topic_id_fkey" FOREIGN KEY ("topic_id") REFERENCES "topic_device"("id") ON DELETE CASCADE ON UPDATE CASCADE;

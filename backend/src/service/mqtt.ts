@@ -1,17 +1,19 @@
 import Logger from '../log/pino';
-import { separateFamilyClientAndTopic } from './utils';
 import { config } from './config';
-import { topicsQos0, topicsQos1 } from './topics';
 import mqtt from 'mqtt';
 import { redisClient } from '../db/redis';
 import db from '../db/prisma';
-import { DeviceType, Status } from '@prisma/client';
+import { DeviceType, Status, TopicDevice } from '@prisma/client';
+import { updateStatusDevice } from './utils';
+
+type TopicDetails = {
+  topicId: string;
+  isDataRecorded: boolean;
+} | null;
 
 export const mqttClient = mqtt.connect({ ...config });
 
-const topic = 'topic/name';
-
-mqttClient.on('connect', (CONNAK) => {
+mqttClient.on('connect', async (CONNAK) => {
   if (mqttClient.connected === true) {
     Logger.info(`${JSON.stringify(CONNAK)}`);
     mqttClient.publish(`server/${process.env.CLIENT_ID}/online`, 'true', {
@@ -22,52 +24,42 @@ mqttClient.on('connect', (CONNAK) => {
 
   // unsubscribe from all topics
   mqttClient.unsubscribe('#');
-  // subscribe to a topic
-  topicsQos0.forEach((topic: any) => {
-    mqttClient.subscribe(topic, { qos: 0 });
-  });
-  topicsQos1.forEach((topic: any) => {
-    mqttClient.subscribe(topic, { qos: 1 });
+
+  const data = await db.topicDevice.findMany();
+
+  data.forEach((topicDevice: TopicDevice) => {
+    const { topic, qos: qosDevice } = topicDevice;
+    const qos = qosDevice === 0 ? 0 : qosDevice === 1 ? 1 : 2;
+    // subscribe to a topic
+    mqttClient.subscribe(topic, { qos });
   });
 });
 
-mqttClient.on('message', async (clientAndTopic, message) => {
-  const { family, client, topic } =
-    separateFamilyClientAndTopic(clientAndTopic);
-  const clientR = await redisClient.get(topic);
+mqttClient.on('message', async (topic, message) => {
+  await updateStatusDevice(topic, message, db, Status);
 
-  if (!clientR) {
-    console.log(
-      `client ${client} does not exist, topic: ${topic}, message: ${message}`
-    );
-    await redisClient.set(topic, client);
-    await db.device.create({
-      data: {
-        deviceFamily: family,
-        deviceName: client,
-        defaultName: client,
-        topic: topic,
-        data: message.toString(),
-      },
+  const topicDetails = await redisClient.get(topic);
+
+  if (!topicDetails) {
+    const data = await db.topicDevice.findUnique({
+      where: { topic },
+      select: { id: true, isDataRecorded: true },
     });
+
+    if (data?.id) await redisClient.set(topic, JSON.stringify(data));
   }
 
-  if (topic.endsWith('online') || topic.endsWith('status')) {
-    const status =
-      message.toString() === 'true' ? Status.ONLINE : Status.OFFLINE;
-    await db.deviceStatus.upsert({
-      where: { deviceName: client },
-      update: { status: status },
-      create: { deviceName: client, status: status },
-    });
+  if (topicDetails) {
+    const { id, isDataRecorded } = JSON.parse(topicDetails);
+
+    if (isDataRecorded && id) {
+      await db.topicRecord.create({
+        data: { topicId: id, data: message.toString() },
+      });
+    }
   }
 
-  await db.device.updateMany({
-    where: { topic },
-    data: { data: message.toString() },
-  });
-
-  console.log(`client: ${client}, topic: ${topic}, message: ${message}`);
+  console.log(` topic: ${topic}, message: ${message}`);
 });
 
 mqttClient.on('packetsend', function (packet) {
