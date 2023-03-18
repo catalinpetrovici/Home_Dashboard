@@ -43,7 +43,7 @@ app.get('/api/v1/ip', (req, res) => res.status(200).send(req.ip));
 app.use('/api/v1/auth', middleware.limiter.accountLimiter, authRouter);
 
 app.use('/api/v1/dashboard', middleware.limiter.apiLimiter, dashboardRouter);
-app.use('/api/v1/devices', middleware.limiter.accountLimiter, devicesRouter);
+app.use('/api/v1/devices', middleware.limiter.apiLimiter, devicesRouter);
 
 app.use(middleware.notFound);
 app.use(middleware.errorHandler);

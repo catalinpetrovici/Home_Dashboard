@@ -30,28 +30,10 @@
 - [ ] Health Checks and Graceful Shutdown - (express)[https://expressjs.com/en/advanced/healthcheck-graceful-shutdown.html]
 
 
+- [ ] Inventory Home App
+
+
 ### Migrate to Next.js
 
 - code splitting by default
 - image optimization "<Image>"
-
-#### ENV
-
-express.env: 
-	NODE_ENV=test
-	PORT_SERVER=test
-	HOST_SERVER=test
-	HOST_NODERED=test
-	HOST_CLIENT=test
-	PORT_CLIENT=test
-	REDIS_SERVER=test
-	REDIS_PORT=test
-	POSTGRE_SERVER=test
-	POSTGRE_PORT=test
-
-postgre.env:
-	POSTGRES_USER=test
-	POSTGRES_PASSWORD=test
-
-redis.env
-	REDIS_HOST_PASSWORD=test

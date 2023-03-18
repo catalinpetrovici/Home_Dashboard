@@ -77,9 +77,10 @@ model TopicDevice {
   deviceId        String?       @map("device_id")
   topic           String        @unique
   qos             Int
-  topicName       String?       @map("topic_name")
-  type            DeviceType    @default(UNSPECIFIED)
-  isDataRecorded  Boolean?      @default(false) @map("is_data_recorded")
+  topicName       String        @map("topic_name")
+  deviceType      DeviceType    @default(UNSPECIFIED) @map("device_type")
+  dataType        DataType      @map("data_type")
+  isDataRecorded  Boolean       @default(false) @map("is_data_recorded")
   columnDashboard Int?          @map("column_dashboard")
   lineDashboard   Int?          @map("line_dashboard")
   createdAt       DateTime      @default(now()) @map("created_at")
@@ -100,15 +101,19 @@ model TopicRecord {
   @@map("topic_record")
 }
 
-model TopicRecordChart {
+model TopicRecordByDay {
   topicId   String   @map("topic_id")
   createdAt DateTime @default(now()) @map("created_at")
-  data      String
-  0         String
-  1         String
+  data      Json
 
   @@id([topicId, createdAt])
-  @@map("topic_record_chart")
+  @@map("topic_record_by_day")
+}
+
+enum DataType {
+  BOOLEAN
+  STRING
+  NUMBER
 }
 
 enum DeviceType {

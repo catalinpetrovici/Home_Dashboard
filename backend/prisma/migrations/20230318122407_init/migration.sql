@@ -1,4 +1,7 @@
 -- CreateEnum
+CREATE TYPE "DataType" AS ENUM ('BOOLEAN', 'STRING', 'NUMBER');
+
+-- CreateEnum
 CREATE TYPE "DeviceType" AS ENUM ('UNSPECIFIED', 'STATUS', 'HUMIDITY', 'TEMPERATURE', 'ELECTRICPOWER', 'MOTIONSENSOR', 'LEDSTRIP', 'SWITCH', 'SLIDER', 'DISPLAY', 'TEXT');
 
 -- CreateEnum
@@ -65,9 +68,10 @@ CREATE TABLE "topic_device" (
     "device_id" TEXT,
     "topic" TEXT NOT NULL,
     "qos" INTEGER NOT NULL,
-    "topic_name" TEXT,
-    "type" "DeviceType" NOT NULL DEFAULT 'UNSPECIFIED',
-    "is_data_recorded" BOOLEAN DEFAULT false,
+    "topic_name" TEXT NOT NULL,
+    "device_type" "DeviceType" NOT NULL DEFAULT 'UNSPECIFIED',
+    "data_type" "DataType" NOT NULL,
+    "is_data_recorded" BOOLEAN NOT NULL DEFAULT false,
     "column_dashboard" INTEGER,
     "line_dashboard" INTEGER,
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -83,6 +87,15 @@ CREATE TABLE "topic_record" (
     "data" TEXT NOT NULL,
 
     CONSTRAINT "topic_record_pkey" PRIMARY KEY ("topic_id","created_at")
+);
+
+-- CreateTable
+CREATE TABLE "topic_record_by_day" (
+    "topic_id" TEXT NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "data" JSONB NOT NULL,
+
+    CONSTRAINT "topic_record_by_day_pkey" PRIMARY KEY ("topic_id","created_at")
 );
 
 -- CreateIndex

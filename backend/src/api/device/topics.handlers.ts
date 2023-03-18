@@ -32,25 +32,33 @@ async function add(req: Request, res: Response): Promise<void> {
     topic,
     qos,
     topicName,
-    type,
+    deviceType,
+    dataType,
     isDataRecorded,
     columnDashboard,
     lineDashboard,
   } = await AddTopicDevice.parseAsync(req.body);
 
-  const data = await db.topicDevice.findMany({ where: { topic } });
+  const device = await db.device.findFirst({ where: { id } });
 
-  if (data.length > 0) {
+  if (!device) {
+    throw new APIError.BadRequestError('Device does not exists');
+  }
+
+  const topicDevice = await db.topicDevice.findFirst({ where: { topic } });
+
+  if (topicDevice) {
     throw new APIError.BadRequestError('Topic already exists');
   }
 
-  const topicDevice = await db.topicDevice.create({
+  const newTopicDevice = await db.topicDevice.create({
     data: {
       deviceId: id,
       topic,
       qos,
       topicName,
-      type,
+      deviceType,
+      dataType,
       isDataRecorded,
       columnDashboard,
       lineDashboard,
@@ -59,7 +67,7 @@ async function add(req: Request, res: Response): Promise<void> {
 
   await subscribeToTopic(topic, qos);
 
-  res.status(StatusCodes.CREATED).json({ ...topicDevice });
+  res.status(StatusCodes.CREATED).json({ ...newTopicDevice });
 }
 
 async function update(req: Request, res: Response): Promise<void> {
@@ -69,22 +77,23 @@ async function update(req: Request, res: Response): Promise<void> {
     topic,
     qos,
     topicName,
-    type,
+    deviceType,
+    dataType,
     isDataRecorded,
     columnDashboard,
     lineDashboard,
   } = await UpdateTopicDevice.parseAsync(req.body);
 
-  const data = await db.topicDevice.findFirst({
-    where: { id: topicId },
+  const topicDevice = await db.topicDevice.findFirst({
+    where: { topic },
     select: { topic: true },
   });
 
-  if (!data) {
+  if (!topicDevice) {
     throw new APIError.BadRequestError('This topic do not match our records');
   }
 
-  const topicDevice = await db.topicDevice.update({
+  const updatedTopicDevice = await db.topicDevice.update({
     where: {
       id: topicId,
     },
@@ -92,37 +101,38 @@ async function update(req: Request, res: Response): Promise<void> {
       topic,
       qos,
       topicName,
-      type,
+      deviceType,
+      dataType,
       isDataRecorded,
       columnDashboard,
       lineDashboard,
     },
   });
 
-  await invalidateTopicCache(data.topic);
+  await invalidateTopicCache(topicDevice.topic);
 
-  res.status(StatusCodes.OK).json({ ...topicDevice });
+  res.status(StatusCodes.OK).json({ ...updatedTopicDevice });
 }
 
 async function remove(req: Request, res: Response): Promise<void> {
   const { topicId } = req.params;
 
-  const data = await db.topicDevice.findFirst({
+  const topicDevice = await db.topicDevice.findFirst({
     where: { id: topicId },
     select: { topic: true, qos: true },
   });
 
-  if (!data) {
+  if (!topicDevice) {
     throw new APIError.BadRequestError('This topic do not match our records');
   }
 
-  const device = await db.topicDevice.delete({
+  await db.topicDevice.delete({
     where: {
       id: topicId,
     },
   });
 
-  const { topic, qos } = data;
+  const { topic, qos } = topicDevice;
 
   await unsubscribeToTopic(topic, qos);
   await invalidateTopicCache(topic);
@@ -133,16 +143,16 @@ async function remove(req: Request, res: Response): Promise<void> {
 async function refresh(req: Request, res: Response): Promise<void> {
   const { topicId } = req.params;
 
-  const data = await db.topicDevice.findFirst({
+  const topicDevice = await db.topicDevice.findFirst({
     where: { id: topicId },
     select: { topic: true, qos: true },
   });
 
-  if (!data) {
+  if (!topicDevice) {
     throw new APIError.BadRequestError('This topic do not match our records');
   }
 
-  const { topic, qos } = data;
+  const { topic, qos } = topicDevice;
 
   await unsubscribeToTopic(topic, qos);
   await invalidateTopicCache(topic);
