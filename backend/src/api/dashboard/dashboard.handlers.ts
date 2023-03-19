@@ -55,7 +55,7 @@ export async function getNowTempHum(
 
   const data = await db.topicRecord.findMany({});
 
-  res.json(data);
+  res.json({ length: data.length, data });
 }
 
 export default { getData, ledControl, getCharts, getTempHum, getNowTempHum };

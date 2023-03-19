@@ -14,13 +14,13 @@ datasource db {
 
 model User {
   id               String           @id @unique @default(cuid())
-  createdAt        DateTime         @default(now()) @map("created_at")
-  updatedAt        DateTime         @updatedAt @map("updated_at")
   lastName         String           @map("last_name") @db.VarChar(20)
   firstName        String           @map("first_name") @db.VarChar(20)
   email            String           @unique
   phoneNumber      String           @unique @map("phone_number")
   role             Role             @default(UNVERIFIED)
+  createdAt        DateTime         @default(now()) @map("created_at")
+  updatedAt        DateTime         @updatedAt @map("updated_at")
   verificationCode String?          @map("verification_code")
   password         String           @unique
   userPreferences  UserPreferences?
@@ -73,20 +73,21 @@ model Device {
 }
 
 model TopicDevice {
-  id              String        @id @unique @default(cuid())
-  deviceId        String?       @map("device_id")
-  topic           String        @unique
-  qos             Int
-  topicName       String        @map("topic_name")
-  deviceType      DeviceType    @default(UNSPECIFIED) @map("device_type")
-  dataType        DataType      @map("data_type")
-  isDataRecorded  Boolean       @default(false) @map("is_data_recorded")
-  columnDashboard Int?          @map("column_dashboard")
-  lineDashboard   Int?          @map("line_dashboard")
-  createdAt       DateTime      @default(now()) @map("created_at")
-  updatedAt       DateTime      @updatedAt @map("updated_at")
-  Device          Device?       @relation(fields: [deviceId], references: [id], onDelete: Cascade)
-  topicRecord     TopicRecord[]
+  id               String             @id @unique @default(cuid())
+  deviceId         String?            @map("device_id")
+  topic            String             @unique
+  qos              Int
+  topicName        String             @map("topic_name")
+  deviceType       DeviceType         @default(UNSPECIFIED) @map("device_type")
+  dataType         DataType           @map("data_type")
+  isDataRecorded   Boolean            @default(false) @map("is_data_recorded")
+  columnDashboard  Int?               @map("column_dashboard")
+  lineDashboard    Int?               @map("line_dashboard")
+  createdAt        DateTime           @default(now()) @map("created_at")
+  updatedAt        DateTime           @updatedAt @map("updated_at")
+  Device           Device?            @relation(fields: [deviceId], references: [id], onDelete: Cascade)
+  topicRecord      TopicRecord[]
+  topicRecordByDay TopicRecordByDay[]
 
   @@map("topic_device")
 }
@@ -102,12 +103,25 @@ model TopicRecord {
 }
 
 model TopicRecordByDay {
-  topicId   String   @map("topic_id")
-  createdAt DateTime @default(now()) @map("created_at")
+  topicId   String       @map("topic_id")
+  createdAt DateTime     @default(now()) @map("created_at")
   data      Json
+  topic     TopicDevice? @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
   @@id([topicId, createdAt])
   @@map("topic_record_by_day")
+}
+
+model Schedule {
+  id        String   @id @unique @default(cuid())
+  name      String   @unique
+  rule      String
+  repeat    Repeat
+  topic     String
+  message   String
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("schedule")
 }
 
 enum DataType {
@@ -142,4 +156,11 @@ enum Status {
   UNKNOWN
   ONLINE
   OFFLINE
+}
+
+enum Repeat {
+  ONCE
+  INTERVAL
+  INTERVAL_BETWEEN_TIMES
+  AT_SPECIFIC_TIME
 }

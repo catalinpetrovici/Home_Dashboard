@@ -19,58 +19,53 @@ import { updateStatusDevice } from './utils';
 import schedule from 'node-schedule';
 import dayjs from 'dayjs';
 
-const trigger24h = schedule.scheduleJob('0 0 * * *', async function () {
-  const topicDevices = await db.topicDevice.findMany({
-    where: { isDataRecorded: true },
-    select: { id: true, dataType: true },
-  });
+const trigger24h = schedule.scheduleJob(
+  'Reduce Data by Hours for all topic Devices - repeat every 24h',
+  '0 0 * * *',
+  async function () {
+    const topicDevices = await db.topicDevice.findMany({
+      where: { isDataRecorded: true },
+      select: { id: true, dataType: true },
+    });
 
-  const today = new Date(dayjs().format('YYYY-MM-DD'));
-  const yesterday = new Date(dayjs().add(-1, 'day').format('YYYY-MM-DD'));
+    const today = new Date(dayjs().format('YYYY-MM-DD'));
+    const yesterday = new Date(dayjs().add(-1, 'day').format('YYYY-MM-DD'));
 
-  topicDevices.forEach(async (topicDevice) => {
-    const { id, dataType } = topicDevice;
+    topicDevices.forEach(async (topicDevice) => {
+      const { id, dataType } = topicDevice;
 
-    const dataTopic = await db.$queryRaw<
-      DataInput[]
-    >`SELECT created_at as time, data as record 
+      const dataTopic = await db.$queryRaw<
+        DataInput[]
+      >`SELECT created_at as time, data as record 
       FROM topic_record 
       WHERE topic_record.topic_id = ${id} 
         AND topic_record.created_at <= ${today}
         AND topic_record.created_at >= ${yesterday} 
       ORDER BY topic_record.created_at;`;
 
-    await db.$queryRaw<DataInput[]>`DELETE
-      FROM topic_record
-      WHERE topic_record.topic_id = ${id}
-        AND topic_record.created_at <= ${today}
-        AND topic_record.created_at >= ${yesterday};`;
+      if (dataType === 'BOOLEAN' || dataType === 'STRING') {
+        console.log('STRING & BOOLEAN');
+      }
 
-    if (dataType === 'BOOLEAN' || dataType === 'STRING') {
-      console.log('STRING & BOOLEAN');
-    }
+      const data = await reduceDataByHours(
+        await sortDayByHour(dataTopic, dataType)
+      );
 
-    const data = await reduceDataByHours(
-      await sortDayByHour(dataTopic, dataType)
-    );
+      if (dataType === 'NUMBER' && data) {
+        console.log('NUMBER');
+        await db.topicRecordByDay.create({
+          data: { topicId: id, createdAt: yesterday, data },
+        });
+      }
+      console.log(dataTopic);
+    });
 
-    if (dataType === 'NUMBER' && data) {
-      console.log('NUMBER');
-      await db.topicRecordByDay.create({
-        data: { topicId: id, data },
-      });
-    }
-    console.log(dataTopic);
-  });
+    // delete all records from topicRecord
+    await db.topicRecord.deleteMany({});
 
-  console.log('Every 5 Minute!', topicDevices);
-});
-
-type TopicDetails = {
-  topicId: string;
-  isDataRecorded: boolean;
-  typeData: DataType;
-} | null;
+    console.log('Every 5 Minute!', topicDevices);
+  }
+);
 
 export const mqttClient = mqtt.connect({ ...config });
 

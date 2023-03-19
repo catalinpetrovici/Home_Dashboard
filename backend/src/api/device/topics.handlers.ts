@@ -109,7 +109,9 @@ async function update(req: Request, res: Response): Promise<void> {
     },
   });
 
+  await unsubscribeToTopic(topicDevice.topic, qos);
   await invalidateTopicCache(topicDevice.topic);
+  await subscribeToTopic(topic, qos);
 
   res.status(StatusCodes.OK).json({ ...updatedTopicDevice });
 }

@@ -16,6 +16,7 @@ import healthcheck from './api/healthcheck/healthcheck.routes';
 import authRouter from './api/auth/auth.routes';
 import dashboardRouter from './api/dashboard/dashboard.routes';
 import devicesRouter from './api/device/device.routes';
+import schedule from './api/schedule/schedule.routes';
 
 declare module 'express-session' {
   export interface SessionData {
@@ -44,6 +45,7 @@ app.use('/api/v1/auth', middleware.limiter.accountLimiter, authRouter);
 
 app.use('/api/v1/dashboard', middleware.limiter.apiLimiter, dashboardRouter);
 app.use('/api/v1/devices', middleware.limiter.apiLimiter, devicesRouter);
+app.use('/api/v1/schedule', middleware.limiter.apiLimiter, schedule);
 
 app.use(middleware.notFound);
 app.use(middleware.errorHandler);
