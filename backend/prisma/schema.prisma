@@ -19,7 +19,7 @@ model User {
   email            String           @unique
   phoneNumber      String           @unique @map("phone_number")
   role             Role             @default(UNVERIFIED)
-  createdAt        DateTime         @default(now()) @map("created_at")
+  createdAt        DateTime         @default(dbgenerated("now()")) @map("created_at")
   updatedAt        DateTime         @updatedAt @map("updated_at")
   verificationCode String?          @map("verification_code")
   password         String           @unique
@@ -50,7 +50,7 @@ model UserPreferences {
 
 model UserAuthLog {
   userId    String   @map("user_id")
-  logDate   DateTime @default(now()) @map("log_date")
+  logDate   DateTime @default(dbgenerated("now()")) @map("log_date")
   eventType String   @map("event_type")
   userAgent String   @map("user_agent")
   message   String?  @db.Text
@@ -65,7 +65,7 @@ model Device {
   deviceName   String        @unique @map("device_name")
   deviceFamily String        @map("device_family")
   status       Status        @default(UNKNOWN)
-  createdAt    DateTime      @default(now()) @map("created_at")
+  createdAt    DateTime      @default(dbgenerated("now()")) @map("created_at")
   updatedAt    DateTime      @updatedAt @map("updated_at")
   topic        TopicDevice[]
 
@@ -83,7 +83,7 @@ model TopicDevice {
   isDataRecorded   Boolean            @default(false) @map("is_data_recorded")
   columnDashboard  Int?               @map("column_dashboard")
   lineDashboard    Int?               @map("line_dashboard")
-  createdAt        DateTime           @default(now()) @map("created_at")
+  createdAt        DateTime           @default(dbgenerated("now()")) @map("created_at")
   updatedAt        DateTime           @updatedAt @map("updated_at")
   Device           Device?            @relation(fields: [deviceId], references: [id], onDelete: Cascade)
   topicRecord      TopicRecord[]
@@ -94,7 +94,7 @@ model TopicDevice {
 
 model TopicRecord {
   topicId   String       @map("topic_id")
-  createdAt DateTime     @default(now()) @map("created_at")
+  createdAt DateTime     @default(dbgenerated("now()")) @map("created_at")
   data      String
   topic     TopicDevice? @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
@@ -104,7 +104,7 @@ model TopicRecord {
 
 model TopicRecordByDay {
   topicId   String       @map("topic_id")
-  createdAt DateTime     @default(now()) @map("created_at")
+  createdAt DateTime     @default(dbgenerated("now()")) @map("created_at")
   data      Json
   topic     TopicDevice? @relation(fields: [topicId], references: [id], onDelete: Cascade)
 
@@ -119,7 +119,7 @@ model Schedule {
   repeat    Repeat
   topic     String
   message   String
-  createdAt DateTime @default(now()) @map("created_at")
+  createdAt DateTime @default(dbgenerated("now()")) @map("created_at")
 
   @@map("schedule")
 }

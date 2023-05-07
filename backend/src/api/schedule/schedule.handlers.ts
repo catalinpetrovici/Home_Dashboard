@@ -45,6 +45,7 @@ async function add(req: Request, res: Response) {
     schedule.scheduleJob(name, rule, async function () {
       mqttClient.publish(topic, message, {
         qos: 0,
+        retain: true,
       });
 
       const job = schedule.scheduledJobs[newSchedule.name];
